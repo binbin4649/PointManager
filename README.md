@@ -1,0 +1,1 @@
+# BaserCMS用プラグイン PointManager
