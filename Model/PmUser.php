@@ -14,11 +14,6 @@ class PmUser extends AppModel {
 			'className' => 'PointManager.Pmpage',
 			'foreignKey' => 'pmpage_id'
 		],
-		'PointUser' => [
-			'className' => 'Point.PointUser',
-			'foreignKey' => 'mypage_id'
-		],
-		
 	];
     
     
@@ -31,7 +26,7 @@ class PmUser extends AppModel {
 			$this->Mypage->create();
 			$this->Mypage->save($data);
 			$data['PmUser']['mypage_id'] = $this->Mypage->getLastInsertID();
-			$data['PmUser']['pmpage_id'] = $mypage_id;
+			$data['PmUser']['pmpage_id'] = $this->Pmpage->mypageToPmpage($mypage_id);
 			// point_user保存
 			$PointUserModel = ClassRegistry::init('Point.PointUser');
 			$PointUser = ['PointUser' => [

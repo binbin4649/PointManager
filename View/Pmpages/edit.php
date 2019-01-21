@@ -250,6 +250,6 @@ if ($this->Session->check('Message.auth')) {
 
 <div class="my-3 p-1 p-sm-4">
 	<small>
-
+		請求メールは、カンマ区切りで複数アドレス入力することができます。
 	</small>
 </div>

@@ -1,4 +1,3 @@
-
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 ユーザー新規登録
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -33,3 +32,10 @@
 
 ユーザー編集について
 <?php echo $this->BcBaser->siteUrl(); ?>feature/user_edit
+
+
+
+---
+　<?php echo $mailConfig['site_name'] ?>　
+　<?php echo $mailConfig['site_url'] ?>　
+　Mail:<?php echo $mailConfig['site_email'] ?>　

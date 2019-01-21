@@ -10,6 +10,7 @@
 				<td>お名前</td>
 				<td>ポイント</td>
 				<td></td>
+				<td></td>
 			</tr>
 		</thead>
 		<tbody>
@@ -24,6 +25,9 @@
 				<?php else: ?>
 					削除
 				<?php endif; ?>
+			</td>
+			<td>
+				<?php echo $this->BcBaser->link('履歴', '/point_manager/user_totals/index/'.$user['Mypage']['id'], ['class'=>'btn btn-sm btn-outline-primary btn-e', 'role'=>'button']) ?>
 			</td>
 		</tr>
 		<?php endforeach; ?>

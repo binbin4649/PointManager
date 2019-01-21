@@ -53,15 +53,24 @@ class Pmpage extends AppModel {
 		$data['Mypage']['username'] = $data['Mypage']['email'];
 		$data['Mypage']['password_confirm'] = $data['Mypage']['password'];
 		$data['Mypage']['status'] = 0;
-		$this->Mypage->set($data);
-		if($this->Mypage->validates()){
+		
+		$datasource = $this->getDataSource();
+		try{
+			$datasource->begin();
 			$this->Mypage->create();
-			$this->Mypage->save($data);
+			if(!$this->Mypage->save($data)) throw new Exception();
 			$data['Pmpage']['mypage_id'] = $this->Mypage->getLastInsertID();
-			return $this->save($data);
-		}else{
+			$this->create();
+			if(!$this->save($data)) throw new Exception();
+			$data['Pmpage']['id'] = $this->getLastInsertID();
+			$datasource->commit();
+		}catch(Exception $e){
+			$datasource->rollback();
 			return false;
 		}
+		$PmtotalModel = ClassRegistry::init('PointManager.Pmtotal');
+		$PmtotalModel->addPartner($data);
+		return $data;
 	}
     
     public function editSave($data){
@@ -70,6 +79,32 @@ class Pmpage extends AppModel {
 	    }else{
 		    $data['Mypage']['password_confirm'] = $data['Mypage']['password'];
 	    }
+	    $datasource = $this->getDataSource();
+	    try{
+		    $datasource->begin();
+		    $this->Mypage->validator()
+		    	->add('zip', array(
+				    'rule' => 'notBlank',
+				    'message'=>'郵便番号を入力してください。'
+			))->add('address_1', array(
+				    'rule' => 'notBlank',
+				    'message'=>'住所を入力してください。'
+			))->add('tel', array(
+				    'rule' => 'notBlank',
+				    'message'=>'電話番号を入力してください。'
+			));
+		    if(!$this->Mypage->save($data))  throw new Exception();
+		    if(!$this->save($data)) throw new Exception();
+		    $datasource->commit();
+	    }catch(Exception $e){
+		    $datasource->rollback();
+			return false;
+	    }
+	    $PmtotalModel = ClassRegistry::init('PointManager.Pmtotal');
+		$PmtotalModel->updatePartner($data);
+		return $data;
+	    
+/*
 	    $this->Mypage->set($data);
 	    $this->Mypage->validator()
 	    	->add('zip', array(
@@ -86,6 +121,7 @@ class Pmpage extends AppModel {
 		    $this->Mypage->save($data);
 		    return $this->save($data);
 	    }
+*/
     }
     
     

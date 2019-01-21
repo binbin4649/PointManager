@@ -19,8 +19,9 @@ class PmUsersController extends PointManagerAppController {
   public function index(){
 	$user = $this->BcAuth->user();
 	if($this->Pmpage->isNotPmpage($user['id'])) $this->redirect(array('plugin' => 'members', 'controller' => 'mypages', 'action' => 'index'));
+	$pmpage_id = $this->Pmpage->mypageToPmpage($user['id']);;
 	$conditions = [];
-	$conditions[] = array('PmUser.pmpage_id' => $user['id']);
+	$conditions[] = array('PmUser.pmpage_id' => $pmpage_id);
 	$this->paginate = array('conditions' => $conditions,
       'order' => 'PmUser.mypage_id ASC',
       'limit' => 20
@@ -50,7 +51,7 @@ class PmUsersController extends PointManagerAppController {
 		  $data['Admin'] = $user;
 		  if($data){
 			  unset($this->request->data);
-			  $siteName = $this->siteConfig->findByName('name')['SiteConfig']['value'];;
+			  $siteName = $this->siteConfig->findByName('name')['SiteConfig']['value'];
 			  $this->sendMail($data['Mypage']['email'], '[登録完了]'.$siteName, $data, array('template'=>'PointManager.user_add', 'layout'=>'default'));
 			  $this->sendMail($user['email'], '[登録完了]'.$siteName, $data, array('template'=>'PointManager.user_add', 'layout'=>'default'));
 			  $this->setMessage( $data['Mypage']['name'].'さんを登録、メールを送信しました。続けて登録できます。');

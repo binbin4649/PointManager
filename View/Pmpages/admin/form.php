@@ -20,6 +20,7 @@
 <?php echo $this->BcForm->create('Pmpage') ?>
 <?php echo $this->BcForm->input('Pmpage.mypage_id', array('type' => 'hidden')) ?>
 <?php echo $this->BcForm->input('Pmpage.id', array('type' => 'hidden')) ?>
+<?php echo $this->BcForm->input('Pmpage.mf_department_id', array('type' => 'hidden')) ?>
 <?php echo $this->BcForm->input('Mypage.id', array('type' => 'hidden')) ?>
 <div class="section">
 	<table cellpadding="0" cellspacing="0" class="form-table">
@@ -193,6 +194,37 @@
 				<?php echo $this->BcForm->error('Pmpage.memo') ?></td>
 			</td>
 		</tr>
+		<tr>
+			<th colspan="2">追加請求明細</th>
+		</tr>
+		<tr>
+			<th class="col-head" width="150">明細名1</th>
+			<td class="col-input">
+				<?php echo $this->BcForm->input('Pmpage.other_payoff_name1', array('type'=>'text')) ?>
+				<?php echo $this->BcForm->error('Pmpage.other_payoff_name1') ?></td>
+			</td>
+		</tr>
+		<tr>
+			<th class="col-head" width="150">明細金額1</th>
+			<td class="col-input">
+				<?php echo $this->BcForm->input('Pmpage.other_payoff_total1', array('type'=>'text')) ?>
+				<?php echo $this->BcForm->error('Pmpage.other_payoff_total1') ?></td>
+			</td>
+		</tr>
+		<tr>
+			<th class="col-head" width="150">明細名2</th>
+			<td class="col-input">
+				<?php echo $this->BcForm->input('Pmpage.other_payoff_name2', array('type'=>'text')) ?>
+				<?php echo $this->BcForm->error('Pmpage.other_payoff_name2') ?></td>
+			</td>
+		</tr>
+		<tr>
+			<th class="col-head" width="150">明細金額2</th>
+			<td class="col-input">
+				<?php echo $this->BcForm->input('Pmpage.other_payoff_total2', array('type'=>'text')) ?>
+				<?php echo $this->BcForm->error('Pmpage.other_payoff_total2') ?></td>
+			</td>
+		</tr>
 	</table>
 </div>
 <!-- button -->
@@ -203,8 +235,8 @@
 
 <div class="section">
 <ul>
-	<li>[2018-12-27] </li>
-	<li></li>
+	<li>追加請求明細：月額保守とか、毎月定額で請求する明細。2つまで登録可能。明細名と金額のセットで有効。</li>
+	<li>請求メール：カンマ区切りで複数指定可。</li>
 	<li></li>
 </ul>
 </div>
