@@ -15,5 +15,12 @@ App::uses('AppController', 'Controller');
 */
 class PointManagerAppController extends AppController {
 
-	
+	public function beforeFilter() {
+	  parent::beforeFilter();
+	  
+	  if (preg_match('/^admin_/', $this->action)) {
+	  	$this->subMenuElements = array('point_manager');
+	  }
+	  
+	}
 }

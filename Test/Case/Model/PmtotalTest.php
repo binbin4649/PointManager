@@ -44,6 +44,7 @@ class PmtotalTest extends BaserTestCase {
 	    $this->assertEquals(21900, $result[0]['Pmtotal']['total']);
     }
     
+/*
     public function testGetMfAccessToken(){
 	    $data['Pmpage'] = [
 		    'id' => '1',
@@ -67,6 +68,7 @@ class PmtotalTest extends BaserTestCase {
 	    var_dump($result);
 	    die;
     }
+*/
     
 /*
     public function testGetMfAccessToken(){

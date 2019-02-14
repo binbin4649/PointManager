@@ -56,8 +56,8 @@ class PmUser extends AppModel {
 	    if(empty($mypage['email'])){
 		    $mypage['email'] = $this->Mypage->findById($mypage['id'], null, null, -1)['Mypage']['email'];
 	    }
-	    $MccCall = ClassRegistry::init('Mcc.MccCall');
-	    $MccCall->deleteAllReserve($mypage['id']);
+	    //$MccCall = ClassRegistry::init('Mcc.MccCall');
+	    //$MccCall->deleteAllReserve($mypage['id']);
 	    if($this->Mypage->withdrawal($mypage)){
 		    return true;
 	    }else{
@@ -75,7 +75,8 @@ class PmUser extends AppModel {
     }
     
     public function userTying($data){
-	    $PmUser['PmUser']['pmpage_id'] = $data['Mypage']['id'];
+	    $pmpage_id = $this->Pmpage->mypageToPmpage($data['Mypage']['id']);
+	    $PmUser['PmUser']['pmpage_id'] = $pmpage_id;
 	    $PmUser['PmUser']['mypage_id'] = $data['Pmpage']['add_user'];
 	    return $this->save($PmUser);
     }

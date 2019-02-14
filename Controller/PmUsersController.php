@@ -14,6 +14,21 @@ class PmUsersController extends PointManagerAppController {
   
   }
   
+  public function admin_index($pmpage_id){
+	$conditions = array('PmUser.pmpage_id' => $pmpage_id);
+	$this->paginate = array('conditions' => $conditions,
+	  'limit' => 50
+	);
+	$PmUsers = $this->paginate('PmUser');
+	$Pmpage = $this->Pmpage->findById($pmpage_id);
+	$name = $Pmpage['Pmpage']['company_name'].' '.$Pmpage['Mypage']['name'];
+	$this->pageTitle = $name.' ユーザー一覧';
+	foreach($PmUsers as $key=>$val){
+		$PmUsers[$key]['PointUser'] = $this->PointUser->findByMypageId($val['Mypage']['id'], null, null, -1)['PointUser'];
+	}
+	$this->set('PmUsers', $PmUsers);
+  }
+  
   //ユーザー一覧
   //退会しても、ポイント精算が残っている場合は表示される。
   public function index(){

@@ -26,8 +26,9 @@ class PmpagesController extends PointManagerAppController {
       if($data['Pmpage']['mypage_id']) $conditions[] = array('Pmpage.mypage_id' => $data['Pmpage']['mypage_id']);
       if($data['Mypage']['name']) $conditions[] = array('Mypage.name like' => '%'.$data['Mypage']['name'].'%');
     }
+    $conditions[] = array('Mypage.status' => 0);
     $this->paginate = array('conditions' => $conditions,
-      'order' => 'Pmpage.id ASC',
+      'order' => 'Pmpage.id DESC',
       'limit' => 50
     );
     //$this->PointUser->unbindModel(['hasMany' => ['PointBook']]);
@@ -35,7 +36,7 @@ class PmpagesController extends PointManagerAppController {
     $this->set('Pmpage', $Pmpage);
   }
   
-  // PMユーザー追加
+  // PM新規追加、mypage以下も生成する
   public function admin_add(){
 	  $this->pageTitle = 'PM 新規追加';
 	  if(!empty($this->request->data)){
@@ -48,6 +49,20 @@ class PmpagesController extends PointManagerAppController {
 	  }
 	  $this->set('prefecture', Configure::read('pointManagerPlugin.prefecture'));
 	  $this->render('form');
+  }
+  
+  // to associate, PM既存紐付、既存mypageをpmに紐付ける
+  public function admin_ass(){
+	  $this->pageTitle = 'PM 既存紐付';
+	  if(!empty($this->request->data)){
+		  if($this->Pmpage->toAss($this->request->data)){
+	        $this->setMessage( '登録しました。');
+	        $this->redirect(array('action' => 'index'));
+	      }else{
+	        $this->setMessage('エラー', true);
+	      }
+	  }
+	  $this->set('prefecture', Configure::read('pointManagerPlugin.prefecture'));
   }
   
   // PMユーザー編集

@@ -6,40 +6,19 @@
 	}
 ?>
 <?php echo $this->BcForm->create('Pmpage') ?>
-<?php echo $this->BcForm->input('Pmpage.mypage_id', array('type' => 'hidden')) ?>
-<?php echo $this->BcForm->input('Pmpage.id', array('type' => 'hidden')) ?>
-<?php echo $this->BcForm->input('Pmpage.mf_department_id', array('type' => 'hidden')) ?>
-<?php echo $this->BcForm->input('Pmpage.mf_partner_id', array('type' => 'hidden')) ?>
-<?php echo $this->BcForm->input('Mypage.id', array('type' => 'hidden')) ?>
 <div class="section">
 	<table cellpadding="0" cellspacing="0" class="form-table">
 		<tr>
-			<th colspan="2">ログイン情報(必須)</th>
+			<th colspan="2">既存紐付け</th>
 		</tr>
 		<tr>
-			<th class="col-head" width="150">担当者名</th>
+			<th class="col-head" width="150">Mypage.id</th>
 			<td class="col-input">
-				<?php echo $this->BcForm->input('Mypage.name', array('type'=>'text')) ?>
-				<?php echo $this->BcForm->error('Mypage.name') ?></td>
+				<?php echo $this->BcForm->input('Mypage.id', array('type'=>'text')) ?>
+				<small>既存の mypage.id を入力。</small>
+				<?php echo $this->BcForm->error('Mypage.id') ?></td>
 			</td>
 		</tr>
-		<tr>
-			<th class="col-head" width="150">メールアドレス</th>
-			<td class="col-input">
-				<?php echo $this->BcForm->input('Mypage.email', array('type'=>'text', 'size'=>'40')) ?>
-				<br><small>(ログインID)</small>
-				<?php echo $this->BcForm->error('Mypage.email') ?></td>
-			</td>
-		</tr>
-		<tr>
-			<th class="col-head" width="150">パスワード</th>
-			<td class="col-input">
-				<?php echo $this->BcForm->input('Mypage.password', array('type'=>'text')) ?>
-				<br><small>新規登録、または変更する場合のみ入力</small>
-				<?php echo $this->BcForm->error('Mypage.password') ?></td>
-			</td>
-		</tr>
-		
 		<tr>
 			<th colspan="2">取引先</th>
 		</tr>
@@ -218,12 +197,13 @@
 </div>
 <!-- button -->
 <div class="submit">
-<?php echo $this->BcForm->submit('編集', array('div' => false, 'class' => 'button')) ?>
+<?php echo $this->BcForm->submit('紐付ける', array('div' => false, 'class' => 'button')) ?>
 </div>
 <?php echo $this->BcForm->end() ?>
 
 <div class="section">
 <ul>
+	<li>mypageの項目と被ってるところは上書き保存。</li>
 	<li>追加請求明細：月額保守とか、毎月定額で請求する明細。2つまで登録可能。明細名と金額のセットで有効。</li>
 	<li>請求メール：カンマ区切りで複数指定可。</li>
 	<li>マネーフォワード：登録はされるけど、更新はされない。MFの管理画面から直接更新する。</li>

@@ -15,7 +15,7 @@ class PmconfigsController extends PointManagerAppController {
 		  }else{
 			  $this->setMessage('Pmconfig の更新に失敗しました。', true);
 		  }
-		  $this->redirect('/admin');
+		  $this->redirect(['controller'=>'pmpages', 'action'=>'index']);
 	  }else{
 		  $this->request->data = $this->Pmconfig->find('first', []);
 	  }

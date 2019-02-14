@@ -1,9 +1,5 @@
-<?php echo $Pmpage['company_name']."\n" ?>
-<?php 
-	foreach($Pmpage['invoice_names'] as $invoice_name){
-		echo $invoice_name.'様'."\n";
-	}
-?>
+<?php echo $Pmpage['company_name'] ?> 御中
+
 
 いつもお世話になっております。
 <?php echo $mailConfig['site_name'] ?> です。

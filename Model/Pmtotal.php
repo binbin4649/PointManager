@@ -21,8 +21,8 @@ class Pmtotal extends AppModel {
 	    $UserTotalModel->otherPayOff();//その他の明細テーブル作る。月額保守費とか
 	    $UserTotalModel->forwardToUserTotal();//繰越があったらuserTotal追加する
 	    $this->PmPayOff();// pmpage単位の精算
-	    $result = $this->payOffMail();//請求書送付のご案内
-	    
+	    $this->payOffMail();//請求書送付のご案内
+	    $result = $this->mfBillingsCreate();//MFに請求書データ送る
 	    return $result;
     }
     
@@ -108,6 +108,55 @@ class Pmtotal extends AppModel {
 	    return $Pmtotals;
     }
     
+    public function mfBillingsCreate(){
+	    $url = 'https://invoice.moneyforward.com/api/v2/billings';
+	    $res = [];
+	    $UserTotalModel = ClassRegistry::init('PointManager.UserTotal');
+	    $ym = date('Y-m-t');//今月末
+	    $billing_date = date('Y-m-d', strtotime('first day of next month'));//翌月1日
+	    $due_date = date('Y-m-d', strtotime('last day of next month'));//翌月末
+	    $Pmtotals = $this->find('all', [
+		    'conditions' => [
+			    'Pmtotal.yyyymm' => $ym,
+			    'Pmtotal.mf_billing_id' => NULL
+		    ]
+	    ]);
+	    foreach($Pmtotals as $Pmtotal){
+		    $UserTotals = $UserTotalModel->find('all', [
+			    'conditions' => ['UserTotal.pmpage_id' => $Pmtotal['Pmpage']['id'], 'UserTotal.yyyymm' => $ym]
+		    ]);
+			$post_data = [];
+			$post_data['billing'] = [
+				'department_id' => $Pmtotal['Pmpage']['mf_department_id'],
+				'billing_number' => $Pmtotal['Pmtotal']['id'],
+				'billing_date' => $billing_date,
+				'due_date' => $due_date,
+				'document_name' => '請求書'
+			];
+			foreach($UserTotals as $UserTotal){
+				$post_data['billing']['items'][] = [
+					'name' => $UserTotal['UserTotal']['name'],
+					'quantity' => '1',
+					'unit_price' => $UserTotal['UserTotal']['total'],
+				];
+			}
+			$response = $this->mfAccess($url, $post_data, true);
+			if(!empty($response['data']['id'])){
+			    $Pmtotal['Pmtotal']['mf_billing_id'] = $response['data']['id'];
+			    $this->create();
+			    if(!$this->save($Pmtotal)){
+				    $this->log('Pmtotal.php mfBillingsCreate error3. '.print_r($Pmtotal, true), 'emergency');
+			    }
+		    }else{
+			    $this->log('Pmtotal.php mfBillingsCreate error2. '.print_r($response, true), 'emergency');
+			    $this->log('Pmtotal.php mfBillingsCreate error. '.print_r($post_data, true), 'emergency');
+		    }
+		    $res[] = $response;
+	    }
+	    return $res;
+    }
+    
+    
     public function billingAddress($Pmtotal){
 	    if(empty($Pmtotal['Pmpage']['invoice_tel'])) $Pmtotal['Pmpage']['invoice_tel'] = $Pmtotal['Mypage']['tel'];
 	    if(empty($Pmtotal['Pmpage']['invoice_zip'])) $Pmtotal['Pmpage']['invoice_zip'] = $Pmtotal['Mypage']['zip'];
@@ -154,7 +203,8 @@ class Pmtotal extends AppModel {
 	    $response = $this->mfAccess($url, $post_data, true);
 	    if(!empty($response['data']['id'])){
 		    $PmpageModel = ClassRegistry::init('PointManager.Pmpage');
-		    $data['Pmpage']['mf_department_id'] = $response['data']['id'];
+		    $data['Pmpage']['mf_partner_id'] = $response['data']['id'];
+		    $data['Pmpage']['mf_department_id'] = $response['data']['relationships']['departments']['data'][0]['id'];
 		    return $PmpageModel->save($data); 
 	    }else{
 		    $this->log('Pmtotal.php addPartner error2. '.print_r($response, true), 'emergency');
@@ -166,8 +216,9 @@ class Pmtotal extends AppModel {
     // 取引先更新用
     public function updatePartner($data){
 	    $data = $this->billingAddress($data);
-	    $url = 'https://invoice.moneyforward.com/api/v2/partners/'.$data['Pmpage']['mf_department_id'];
+	    $url = 'https://invoice.moneyforward.com/api/v2/partners/'.$data['Pmpage']['mf_partner_id'];
 	    $post_data['partner'] = [
+		    'code' => $data['Pmpage']['id'],
 		    'name' => $data['Pmpage']['invoice_company_name'],
 		    'departments' => [[
 			    'id' => $data['Pmpage']['mf_department_id'],
@@ -218,7 +269,10 @@ class Pmtotal extends AppModel {
     
     // curlを実行して配列で返す
     public function curlExec($url, $post_data, $headers = null){
+	    $fp = fopen(APP.'/tmp/curl.log', 'a');
 	    $ch = curl_init();
+	    curl_setopt($ch, CURLOPT_VERBOSE, true);
+	    curl_setopt($ch, CURLOPT_STDERR, $fp);
 	    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 	    curl_setopt($ch, CURLOPT_URL, $url); 
 	    curl_setopt($ch,CURLOPT_POST, true);
@@ -229,16 +283,19 @@ class Pmtotal extends AppModel {
 		    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($post_data));
 	    }
 	    $return =  curl_exec($ch);
+	    fclose($fp);
 	    curl_close($ch);
 	    $return = mb_convert_encoding($return, 'UTF8', 'ASCII,JIS,UTF-8,EUC-JP,SJIS-WIN');
 	    $aray = json_decode($return, true);
-	    if(isset($aray['errors'])){
+	    if(isset($aray['errors']) or isset($aray['error'])){
 		    $this->log('Pmtotal.php curlExec error. '.print_r($aray, true), 'emergency');
 		    return false;
 	    }
 	    return $aray;
     }
     
+    
+    //curl -d client_id=[CLIENT_ID] -d client_secret=[CLIENT_SECRET] -d redirect_uri=[REDIRECT_URL] -d grant_type=authorization_code -d code=[認証コード] -X POST https://invoice.moneyforward.com/oauth/token
     //アクセストークンを返す。
     public function getMfAccessToken(){
 	    $PmconfigModel = ClassRegistry::init('PointManager.Pmconfig');
@@ -248,7 +305,7 @@ class Pmtotal extends AppModel {
 		    return false;
 	    }
 	    $time_diff = time() - strtotime($Pmconfig['Pmconfig']['modified']);
-	    if($time_diff > 86400){// 1日以上経っていたらアクセストークン更新
+	    if($time_diff > 540){// 9分(540)以上経っていたらアクセストークン更新
 		    $url = "https://invoice.moneyforward.com/oauth/token";
 		    $post_data = [
 			    'client_id' => $Pmconfig['Pmconfig']['client_id'],
@@ -257,15 +314,36 @@ class Pmtotal extends AppModel {
 			    'grant_type' => 'refresh_token',
 		    ];
 		    $new_token = $this->curlExec($url, $post_data);
+		    if(isset($new_token['error']) or isset($new_token['errors'])){
+			    $this->log('Pmtotal.php getMfAccessToken MF API Error. '.print_r($new_token, true), 'emergency');
+			    return false;
+		    }
 		    $Pmconfig['Pmconfig']['access_token'] = $new_token['access_token'];
 		    $Pmconfig['Pmconfig']['refresh_token'] = $new_token['refresh_token'];
+		    $PmconfigModel->create();
 		    if(!$PmconfigModel->save($Pmconfig)){
 			    $this->log('Pmtotal.php getMfAccessToken save error.', 'emergency');
+			    return false;
 		    }
 	    }
 	    return $Pmconfig['Pmconfig'];
     }
     
-    
+    //ログインしてないと認証コードがとれない＝テストはできない
+    // $data = ['client_id', 'client_secret'];
+    public function createMfAccessToken($data){
+	    $siteUrl = urlencode(Configure::read('BcEnv.siteUrl'));
+	    $auth_url = 'https://invoice.moneyforward.com/oauth/authorize?client_id='.$data['client_id'].'&redirect_uri='.$siteUrl.'&response_type=code&scope=write';
+	    $headers = get_headers($auth_url, 1);
+	    $url = "https://invoice.moneyforward.com/oauth/token";
+	    $post_data = [
+		    'client_id' => $Pmconfig['Pmconfig']['client_id'],
+		    'client_secret' => $Pmconfig['Pmconfig']['client_secret'],
+		    'redirect_uri' => '',
+		    'grant_type' => 'authorization_code',
+		    'code' => $code,
+	    ];
+	    
+    }
     
 }

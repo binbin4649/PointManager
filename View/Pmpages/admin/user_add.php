@@ -1,16 +1,3 @@
-<div id="SubMenu" class="clearfix">
-	<table class="sub-menu">
-		<tr>
-			<th>PointManager</th>
-			<td>
-				<ul class="cleafix">
-					<li><a href="/admin/point_manager/pmpages/">PM一覧</a></li>
-					<li><a href="/admin/point_manager/pmpages/add">PM新規追加</a></li>
-				</ul>
-			</td>
-		</tr>
-	</table>
-</div>
 <!-- form -->
 <?php echo $this->BcForm->create('Pmpage') ?>
 <?php echo $this->BcForm->input('Mypage.id', array('type' => 'hidden', 'value' => $Mypage['Mypage']['id'])) ?>
