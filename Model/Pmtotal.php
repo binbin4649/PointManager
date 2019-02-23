@@ -18,6 +18,7 @@ class Pmtotal extends AppModel {
     public function createInvoice(){
 	    $UserTotalModel = ClassRegistry::init('PointManager.UserTotal');
 	    $UserTotalModel->userPayOff();//ユーザー単位の精算
+	    $UserTotalModel->pmPayOff();// pmpage自身のポイント精算
 	    $UserTotalModel->otherPayOff();//その他の明細テーブル作る。月額保守費とか
 	    $UserTotalModel->forwardToUserTotal();//繰越があったらuserTotal追加する
 	    $this->PmPayOff();// pmpage単位の精算
@@ -27,7 +28,7 @@ class Pmtotal extends AppModel {
     }
     
     
-    // pmpage単位で精算
+    // UserTotalを合算、pmpage単位で精算
     public function PmPayOff(){
 	    $forwardPoint = Configure::read('pointManagerPlugin.forwardPoint');
 	    $PmpageModel = ClassRegistry::init('PointManager.Pmpage');

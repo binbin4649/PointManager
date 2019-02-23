@@ -38,5 +38,10 @@ class UserTotalTest extends BaserTestCase {
 	    $this->assertEquals(1000, $result[0]['UserTotal']['total']);
     }
     
+    public function testpmPayOff(){
+	    $result = $this->UserTotal->pmPayOff();
+	    $this->assertEquals(2000, $result[0]['UserTotal']['total']);
+    }
+    
 
 }

@@ -61,6 +61,57 @@ class UserTotal extends AppModel {
 	    }
     }
     
+    // Pmpage本人のPointも精算
+    public function pmPayOff(){
+	    $PmpageModel = ClassRegistry::init('PointManager.Pmpage');
+	    $PointUserModel = ClassRegistry::init('Point.PointUser');
+	    $Pmpages = $PmpageModel->find('all', ['conditions' => ['Mypage.status <>' => '2']]);
+	    $ym = date('Y-m-t');//今月末
+	    $this_month = '('.date('m').'月分)';//今月名
+	    $UserTotals = [];
+	    foreach($Pmpages as $Pmpage){
+		    $PointUser = $PointUserModel->findByMypageId($Pmpage['Pmpage']['mypage_id'], null, null, -1);
+		    //
+		    if($PointUser['PointUser']['point'] < 0){
+			    $datasource = $this->getDataSource();
+			    try{
+				    $datasource->begin();
+				    $total = abs($PointUser['PointUser']['point']);
+				    $UserTotal = [];
+				    $UserTotal['UserTotal'] = [
+					    'pmpage_id' => $Pmpage['Pmpage']['id'],
+					    'mypage_id' => $Pmpage['Pmpage']['mypage_id'],
+					    'name' => $Pmpage['Mypage']['name'].$this_month,
+					    'yyyymm' => $ym,
+					    'total' => $total
+				    ];
+				    $UserTotals[] = $UserTotal;
+				    $this->create();
+				    if(!$this->save($UserTotal)) throw new Exception();
+				    $user_total_id = $this->getLastInsertId();
+				    $point_add_data = [];
+				    $point_add_data = [
+				    	'mypage_id' => $Pmpage['Pmpage']['mypage_id'],
+				    	'point' => $total,
+				    	'reason' => 'invoice',
+				    	'reason_id' => $user_total_id
+				    ];
+				    if(!$PointUserModel->pointAdd($point_add_data)) throw new Exception();
+				    $datasource->commit();
+			    }catch(Exception $e){
+				    $datasource->rollback();
+				    $this->log('UserTotal.php pmPayOff error. : '.print_r($e->getMessage(), true), 'emergency');
+			    }
+		    }
+	    }
+	    if(empty($UserTotals)){
+		    return false;
+	    }else{
+		    return $UserTotals;
+	    }
+    }
+    
+    
     // その他の明細があれば精算（テーブル作成）。月額保守とか、
     public function otherPayOff(){
 	    $PmpageModel = ClassRegistry::init('PointManager.Pmpage');
