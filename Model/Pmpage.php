@@ -67,8 +67,6 @@ class Pmpage extends AppModel {
 			if(!$this->Mypage->save($data)) throw new Exception();
 			$mypage_id = $this->Mypage->getLastInsertID();
 			$data['Pmpage']['mypage_id'] = $mypage_id;
-			// Mylog
-			if(!$this->Mylog->record($mypage_id, 'signup')) throw new Exception();
 			// PointUser
 			$PointUser = ['PointUser' => [
 				'mypage_id' => $mypage_id,
@@ -91,6 +89,10 @@ class Pmpage extends AppModel {
 			$this->log('Pmpage.php signUp error. '.print_r($e->getMessage(), true), 'emergency');
 			$datasource->rollback();
 			return false;
+		}
+		// Mylog
+		if(!$this->Mylog->record($mypage_id, 'signup')){
+			$this->log('Pmpage.php signUp mylog record error. '.print_r($data, true), 'emergency');
 		}
 		return $data;
 	}

@@ -20,11 +20,11 @@ class Pmtotal extends AppModel {
 	    $UserTotalModel->userPayOff();//ユーザー単位の精算
 	    $UserTotalModel->pmPayOff();// pmpage自身のポイント精算
 	    $UserTotalModel->otherPayOff();//その他の明細テーブル作る。月額保守費とか
-	    $UserTotalModel->forwardToUserTotal();//繰越があったらuserTotal追加する
-	    $this->PmPayOff();// pmpage単位の精算
-	    $this->payOffMail();//請求書送付のご案内
-	    $result = $this->mfBillingsCreate();//MFに請求書データ送る
-	    return $result;
+	    $result = $UserTotalModel->forwardToUserTotal();//繰越があったらuserTotal追加する
+	    $pm_payoff = $this->PmPayOff();// pmpage単位の精算
+	    $mail = $this->payOffMail();//請求書送付のご案内
+	    $billing = $this->mfBillingsCreate();//MFに請求書データ送る
+	    return $mail;
     }
     
     
@@ -250,6 +250,11 @@ class Pmtotal extends AppModel {
     // $post_data = array
     // $headers = boolean
     public function mfAccess($url, $post_data = [], $header = false){
+	    if(Configure::read('MccPlugin.TEST_MODE')){
+		   $aray['data']['id'] = 'test_id';
+		   $aray['data']['relationships']['departments']['data'][0]['id'] = 'test_departments_id';
+		   return $aray;
+	    }
 	    $headers = null;
 	    $Pmconfig = $this->getMfAccessToken();
 	    if($header){

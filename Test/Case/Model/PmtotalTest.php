@@ -14,6 +14,7 @@ class PmtotalTest extends BaserTestCase {
     );
 
     public function setUp() {
+	    Configure::write('MccPlugin.TEST_MODE', true);
         $this->Pmtotal = ClassRegistry::init('PointManager.Pmtotal');
         parent::setUp();
     }
@@ -39,9 +40,8 @@ class PmtotalTest extends BaserTestCase {
     }
     
     public function testCreateInvoice(){
-	    Configure::write('MccPlugin.TEST_MODE', true);
 	    $result = $this->Pmtotal->createInvoice();
-	    $this->assertEquals(21900, $result[0]['Pmtotal']['total']);
+	    $this->assertEquals(23900, $result[0]['Pmtotal']['total']);
     }
     
 /*
