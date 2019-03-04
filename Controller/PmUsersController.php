@@ -114,22 +114,17 @@ class PmUsersController extends PointManagerAppController {
 	  $user = $this->BcAuth->user();
 	  if($this->Pmpage->isNotPmpage($user['id'])) $this->redirect(array('plugin' => 'members', 'controller' => 'mypages', 'action' => 'index'));
       $PmUsers = $this->PmUser->findAllByPmpageId($user['id'], null, null, -1);
-      $conditions = [];
-      foreach($PmUsers as $PmUser){
-	      $conditions['OR'][] = ['PointBook.mypage_id' => $PmUser['PmUser']['mypage_id']];
-      }
       if($ym === null){
-	      $ym = date('Ym');
-      }
-      $year = substr($ym, 0, 4);
+	  	$ym = date('Ym');
+	  }
+	  $year = substr($ym, 0, 4);
 	  $month = substr($ym, 4, 2);
-      $conditions[] = ['PointBook.created >=' => date('Y-m-d', strtotime('first day of ' .$year.'-'.$month))];
-      $conditions[] = ['PointBook.created <=' => date('Y-m-d', strtotime('last day of ' .$year.'-'.$month))];
-      $books = $this->PointBook->find('all', [
-	      'conditions' => $conditions,
-	      'order' => 'PointBook.created DESC',
-	      'recursive' => 1,
-      ]);
+      $mypage_ids = [];
+      foreach($PmUsers as $PmUser){
+	      $mypage_ids[] = $PmUser['PmUser']['mypage_id'];
+      }
+      $mypage_ids[] = $user['id'];
+      $books = $this->PointBook->monthlyUserBook($ym, $mypage_ids);
       $this->set('now_date', date('Y年n月', strtotime(date($year.'-'.$month))));
       $this->set('ym', $ym);
 	  $this->set('books', $books);
@@ -139,22 +134,16 @@ class PmUsersController extends PointManagerAppController {
 	  $user = $this->BcAuth->user();
 	  if($this->Pmpage->isNotPmpage($user['id'])) $this->redirect(array('plugin' => 'members', 'controller' => 'mypages', 'action' => 'index'));
       $PmUsers = $this->PmUser->findAllByPmpageId($user['id'], null, null, -1);
-      $conditions = [];
-      foreach($PmUsers as $PmUser){
-	      $conditions['OR'][] = ['PointBook.mypage_id' => $PmUser['PmUser']['mypage_id']];
-      }
       if($ym === null){
 	      $ym = date('Ym');
       }
       $year = substr($ym, 0, 4);
 	  $month = substr($ym, 4, 2);
-      $conditions[] = ['PointBook.created >=' => date('Y-m-d', strtotime('first day of ' .$year.'-'.$month))];
-      $conditions[] = ['PointBook.created <=' => date('Y-m-d', strtotime('last day of ' .$year.'-'.$month))];
-      $books = $this->PointBook->find('all', [
-	      'conditions' => $conditions,
-	      'order' => 'PointBook.created DESC',
-	      'recursive' => 1,
-      ]);
+      foreach($PmUsers as $PmUser){
+	      $mypage_ids[] = $PmUser['PmUser']['mypage_id'];
+      }
+      $mypage_ids[] = $user['id'];
+      $books = $this->PointBook->monthlyUserBook($ym, $mypage_ids);
       $this->autoRender = false;
       $this->response->type('csv');
       $this->response->download($ym.".csv");
