@@ -311,7 +311,7 @@ class Pmtotal extends AppModel {
 		    return false;
 	    }
 	    $time_diff = time() - strtotime($Pmconfig['Pmconfig']['modified']);
-	    if($time_diff > 540){// 9分(540)以上経っていたらアクセストークン更新
+	    if($time_diff > 43200){// 43200 = 12時間
 		    $url = "https://invoice.moneyforward.com/oauth/token";
 		    $post_data = [
 			    'client_id' => $Pmconfig['Pmconfig']['client_id'],
