@@ -32,6 +32,16 @@ class PmpageFixture extends CakeTestFixture {
 			'created' => '2018-07-30 14:06:01',
 			'modified' => '2018-07-30 14:06:01'
 		),
+		array(
+			'id' => 5,
+			'mypage_id' => 5,
+			'company_name' => 'テスト会社5',
+			'prefecture' => '東京',
+			'department_name' => '営業部',
+			'position_name' => '部長',
+			'created' => '2018-07-30 14:06:01',
+			'modified' => '2018-07-30 14:06:01'
+		),
 	);
 
 }

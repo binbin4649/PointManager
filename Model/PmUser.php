@@ -74,6 +74,7 @@ class PmUser extends AppModel {
 	    }
     }
     
+    // 紐付け
     public function userTying($data){
 	    $pmpage_id = $this->Pmpage->mypageToPmpage($data['Mypage']['id']);
 	    $PmUser['PmUser']['pmpage_id'] = $pmpage_id;

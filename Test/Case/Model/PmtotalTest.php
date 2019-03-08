@@ -32,6 +32,11 @@ class PmtotalTest extends BaserTestCase {
 	    $this->assertEquals('run', $result[0]['Pmtotal']['status']);
     }
     
+    public function testPayOffMail(){
+	    $r = $this->Pmtotal->payOffMail();
+	    $this->assertEquals('submit', $r[0]['Pmtotal']['mail_submit']);
+    }
+    
     public function testPmPayOffForward(){
 	    Configure::write('pointManagerPlugin.forwardPoint', 10000);
 	    $result = $this->Pmtotal->PmPayOff();
@@ -41,8 +46,14 @@ class PmtotalTest extends BaserTestCase {
     
     public function testCreateInvoice(){
 	    $result = $this->Pmtotal->createInvoice();
-	    $this->assertEquals(23900, $result[0]['Pmtotal']['total']);
+	    $this->assertEquals(23900, $result[1]['Pmtotal']['total']);
     }
+    
+    public function testMfBillingsCreate(){
+	    $r = $this->Pmtotal->mfBillingsCreate();
+	    $this->assertEquals('test_id', $r[0]['data']['id']);
+    }
+    
     
 /*
     public function testGetMfAccessToken(){

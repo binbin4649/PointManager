@@ -17,9 +17,9 @@ class Pmtotal extends AppModel {
     //全部のまとめ役、cronで叩く用
     public function createInvoice(){
 	    $UserTotalModel = ClassRegistry::init('PointManager.UserTotal');
-	    $UserTotalModel->userPayOff();//ユーザー単位の精算
-	    $UserTotalModel->pmPayOff();// pmpage自身のポイント精算
-	    $UserTotalModel->otherPayOff();//その他の明細テーブル作る。月額保守費とか
+	    $user_payoff = $UserTotalModel->userPayOff();//ユーザー単位の精算
+	    $pmpage_payoff = $UserTotalModel->pmPayOff();// pmpage自身のポイント精算
+	    $other_payoff = $UserTotalModel->otherPayOff();//その他の明細テーブル作る。月額保守費とか
 	    $result = $UserTotalModel->forwardToUserTotal();//繰越があったらuserTotal追加する
 	    $pm_payoff = $this->PmPayOff();// pmpage単位の精算
 	    $mail = $this->payOffMail();//請求書送付のご案内
@@ -80,7 +80,8 @@ class Pmtotal extends AppModel {
     
     public function payOffMail(){
 	    $PointUserModel = ClassRegistry::init('Point.PointUser');
-	    $ym = date('Y-m-t');//今月
+	    $return = [];
+	    $ym = date('Y-m-t');//今月末
 	    $Pmtotals = $this->find('all', [
 		    'conditions' => [
 			    'Pmtotal.yyyymm' => $ym,
@@ -104,9 +105,12 @@ class Pmtotal extends AppModel {
 		    }
 		    $Pmtotal['Pmtotal']['mail_submit'] = 'submit';
 		    $this->create();
-		    $this->save($Pmtotal);
+		    if(!$this->save($Pmtotal)){
+			    $this->log('Pmtotal.php payOffMail save error. '.print_r($Pmtotal, true), 'emergency');
+		    }
+		    $return[] = $Pmtotal;
 	    }
-	    return $Pmtotals;
+	    return $return;
     }
     
     public function mfBillingsCreate(){
@@ -335,6 +339,7 @@ class Pmtotal extends AppModel {
 	    return $Pmconfig['Pmconfig'];
     }
     
+    //使ってない
     //ログインしてないと認証コードがとれない＝テストはできない
     // $data = ['client_id', 'client_secret'];
     public function createMfAccessToken($data){
