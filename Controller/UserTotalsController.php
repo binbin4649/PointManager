@@ -27,18 +27,8 @@ class UserTotalsController extends PointManagerAppController {
 	if($this->Pmpage->isNotPmpage($user['id'])) $this->redirect(array('plugin' => 'members', 'controller' => 'mypages', 'action' => 'index'));
 	if($ym === null) $this->redirect(array('plugin' => 'members', 'controller' => 'mypages', 'action' => 'index'));
 	$pmpage_id = $this->Pmpage->mypageToPmpage($user['id']);
-	$UserTotals = $this->UserTotal->find('all', [
-		'conditions' => [
-			'UserTotal.yyyymm' => $ym,
-			'UserTotal.pmpage_id' => $pmpage_id
-		]
-	]);
-	$Pmtotal = $this->Pmtotal->find('first', [
-		'conditions' => [
-			'Pmtotal.pmpage_id' => $pmpage_id,
-			'Pmtotal.yyyymm' => $ym
-		]
-	]);
+	$UserTotals = $this->UserTotal->fromPmpageId($pmpage_id, $ym);
+	$Pmtotal = $this->Pmtotal->fromPmpageId($pmpage_id, $ym);
 	$this->set('UserTotals', $UserTotals);
 	$this->set('Pmtotal', $Pmtotal);
   }

@@ -43,5 +43,12 @@ class UserTotalTest extends BaserTestCase {
 	    $this->assertEquals(2000, $result[0]['UserTotal']['total']);
     }
     
+    public function testFromPmpageId(){
+	    $pmpage_id = 1;
+	    $yyyymm = date('Ym');
+	    $r = $this->UserTotal->fromPmpageId($pmpage_id, $yyyymm);
+	    $this->assertEquals('1', $r[0]['UserTotal']['pmpage_id']);
+    }
+    
 
 }

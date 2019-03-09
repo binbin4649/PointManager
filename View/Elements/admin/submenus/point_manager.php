@@ -6,6 +6,9 @@
         <?php $this->bcBaser->link('PM一覧', array('controller' => 'pmpages', 'action' => 'index')) ?>
       </li>
       <li>
+        <?php $this->bcBaser->link('請求一覧', array('controller' => 'pmtotals', 'action' => 'index')) ?>
+      </li>
+      <li>
         <?php $this->bcBaser->link('PM新規追加', array('controller' => 'pmpages', 'action' => 'add')) ?>
       </li>
       <li>

@@ -13,6 +13,34 @@ class Pmtotal extends AppModel {
 			'className' => 'PointManager.Pmpage',
 			'foreignKey' => 'pmpage_id'],
 	];
+	
+	// pmtotal_id で UserTotals を返す
+	public function toUserTotals($id){
+		$this->UserTotal = ClassRegistry::init('PointManager.UserTotal');
+		$Pmtotal = $this->findById($id, null, null, -1);
+		$UserTotals = $this->UserTotal->fromPmpageId($Pmtotal['Pmtotal']['pmpage_id'], $Pmtotal['Pmtotal']['yyyymm']);
+		return $UserTotals;
+	}
+	
+	// 指定月の Pmtotal を返す
+	public function fromPmpageId($pmpage_id, $yyyymm){
+		if(empty($pmpage_id)){
+		    return false;
+	    }
+	    $date = $this->lastDay($yyyymm);
+	    $Pmtotal = $this->find('first', [
+			'conditions' => [
+				'Pmtotal.pmpage_id' => $pmpage_id,
+				'Pmtotal.yyyymm' => $date
+			]
+		]);
+		return $Pmtotal;
+	}
+	
+	// yyyymm を 指定月の月末 yyyy-mm-dd 形式で返す
+	public function lastDay($yyyymm){
+		return date('Y-m-d', strtotime('last day of ' . $yyyymm));
+	}
     
     //全部のまとめ役、cronで叩く用
     public function createInvoice(){

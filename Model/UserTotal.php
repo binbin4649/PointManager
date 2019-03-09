@@ -5,6 +5,21 @@ class UserTotal extends AppModel {
 
 	public $name = 'UserTotal';
     
+    // pmpage_id と yyyymm で紐付いてる userTotal を返す
+    public function fromPmpageId($pmpage_id, $yyyymm){
+	    if(empty($pmpage_id)){
+		    return false;
+	    }
+	    $this->Pmtotal = ClassRegistry::init('PointManager.Pmtotal');
+	    $date = $this->Pmtotal->lastDay($yyyymm);
+	    $UserTotals = $this->find('all', [
+	    	'conditions' => [
+	    		'UserTotal.pmpage_id' => $pmpage_id,
+	    		'UserTotal.yyyymm' => $date,
+	    	]
+	    ]);
+	    return $UserTotals;
+    }
     
     //ユーザー単位に精算
     public function userPayOff(){
