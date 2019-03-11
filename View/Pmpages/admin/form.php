@@ -4,6 +4,9 @@
 	if(isset($this->request->data['Mypage']['password'])){
 		unset($this->request->data['Mypage']['password']);
 	}
+	if(isset($this->request->data['Pmpage'])){
+		$Pmpage = $this->request->data['Pmpage'];
+	}
 ?>
 <?php echo $this->BcForm->create('Pmpage') ?>
 <?php echo $this->BcForm->input('Pmpage.mypage_id', array('type' => 'hidden')) ?>
@@ -46,8 +49,8 @@
 		<tr>
 			<th class="col-head" width="150">MF</th>
 			<td class="col-input">
-				partner_id : <?php echo $this->request->data['Pmpage']['mf_partner_id'] ?><br>
-				department_id : <?php echo $this->request->data['Pmpage']['mf_department_id'] ?>
+				partner_id : <?php if(!empty($Pmpage['mf_partner_id'])) echo $Pmpage['mf_partner_id'] ?><br>
+				department_id : <?php if(!empty($Pmpage['mf_department_id'])) echo $Pmpage['mf_department_id'] ?>
 			</td>
 		</tr>
 		<tr>

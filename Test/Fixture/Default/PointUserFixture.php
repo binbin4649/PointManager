@@ -45,6 +45,16 @@ class PointUserFixture extends CakeTestFixture {
 			'created' => '2018-07-30 16:26:01',
 			'modified' => '2018-07-30 16:26:01',
 		),
+		array(
+			'id' => 6,
+			'mypage_id' => 6,
+			'point' => '0',
+			'credit' => 0,
+			'available_point' => 0,
+			'pay_plan' => 'basic',
+			'created' => '2018-07-30 16:26:01',
+			'modified' => '2018-07-30 16:26:01',
+		),
 	);
 
 }

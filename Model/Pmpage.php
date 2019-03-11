@@ -126,10 +126,8 @@ class Pmpage extends AppModel {
 				$this->log('Pmpage.php toAss error. Mypage.'.print_r($Mypage, true), 'emergency');
 				throw new Exception();
 			}
-			$PointUser = ['PointUser' => [
-				'pay_plan' => 'pay_off',
-				'invoice_plan' => 'pm_month'
-			]];
+			$PointUser['PointUser']['pay_plan'] = 'pay_off';
+			$PointUser['PointUser']['invoice_plan'] = 'pm_month';
 			$this->PointUser->create();
 			if(!$this->PointUser->save($PointUser)){
 				$this->log('Pmpage.php toAss error. PointUser.'.print_r($PointUser, true), 'emergency');

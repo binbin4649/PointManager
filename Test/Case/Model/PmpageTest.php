@@ -36,7 +36,9 @@ class PmpageTest extends BaserTestCase {
     }
 
     public function setUp() {
+	    Configure::write('MccPlugin.TEST_MODE', true);
         $this->Pmpage = ClassRegistry::init('PointManager.Pmpage');
+        $this->PointUser = ClassRegistry::init('Point.PointUser');
         parent::setUp();
     }
     
@@ -69,46 +71,39 @@ class PmpageTest extends BaserTestCase {
 	    $this->assertTrue($this->Pmpage->validates());
     }
     
-/*
-    public function testSignUp(){
-	    $data = [
-		    'Mypage' => [
-			    'name' => 'testさん',
-			    'email' => 'test1@test.com',
-			    'password' => '111222',
-			    'tel' => '03-1111-1111',
-			    'zip' => '001-0003',
-			    'address_1' => '札幌市時計台1−1−1',
-			    'address_2' => '',
-		    ],
-		    'Pmpage' => [
-			    'company_name' => '株式会社テスト',
-			    'prefecture' => '北海道',
-			    'department_name' => '',
-			    'position_name' => '',
-			    'invoice_company_name' => '',
-			    'invoice_department_name' => '',
-			    'invoice_position_name' => '',
-			    'invoice_name' => '',
-			    'invoice_tel' => '',
-			    'invoice_zip' => '',
-			    'invoice_prefecture' => '',
-			    'invoice_address_1' => '',
-			    'invoice_address_2' => '',
-			    'invoice_email' => '',
-			    'memo' => '',
-			    'other_payoff_name1' => '',
-			    'other_payoff_total1' => '',
-			    'other_payoff_name2' => '',
-			    'other_payoff_total2' => '',
-		    ]
+    public function testToAss(){
+	    $data['Mypage']['id'] = 6;
+	    $data['Mypage']['zip'] = '100-0001';
+	    $data['Mypage']['address_1'] = '札幌市時計台残念';
+	    $data['Mypage']['address_2'] = '1-1-1';
+	    $data['Mypage']['tel'] = '0312345678';
+	    $data['Pmpage'] = [
+		    'prefecture' => '北海道',
+		    'company_name' => 'テスト会社6',
+		    'department_name' => '',
+		    'position_name' => '',
+		    'invoice_company_name' => '',
+		    'invoice_department_name' => '',
+		    'invoice_position_name' => '',
+		    'invoice_name' => '',
+		    'invoice_tel' => '',
+		    'invoice_zip' => '',
+		    'invoice_prefecture' => '',
+			'invoice_address_1' => '',
+			'invoice_address_2' => '',
+			'invoice_email' => '',
+			'memo' => '',
+			'other_payoff_name1' => '',
+			'other_payoff_total1' => '',
+			'other_payoff_name2' => '',
+			'other_payoff_total2' => ''
 	    ];
-	    $r = $this->Pmpage->signUp($data);
-	    //var_dump($this->Pmpage->validationErrors);
-	    var_dump($r);
-	    die;
+	    $r = $this->Pmpage->toAss($data);
+	    if($r){
+		    $PointUser = $this->PointUser->findById(6);
+	    }
+	    $this->assertEquals('pay_off', $PointUser['PointUser']['pay_plan']);
     }
-*/
     
     
 
