@@ -113,7 +113,8 @@ class Pmtotal extends AppModel {
 	    $Pmtotals = $this->find('all', [
 		    'conditions' => [
 			    'Pmtotal.yyyymm' => $ym,
-			    'Pmtotal.mail_submit' => NULL
+			    'Pmtotal.mail_submit' => NULL,
+			    'Pmpage.invoice_mail_notice' => 'yes'
 		    ]
 	    ]);
 	    foreach($Pmtotals as $Pmtotal){

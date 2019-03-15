@@ -46,7 +46,7 @@ class PmtotalTest extends BaserTestCase {
     
     public function testCreateInvoice(){
 	    $result = $this->Pmtotal->createInvoice();
-	    $this->assertEquals(23900, $result[1]['Pmtotal']['total']);
+	    $this->assertEquals(23900, $result[0]['Pmtotal']['total']);
     }
     
     public function testMfBillingsCreate(){

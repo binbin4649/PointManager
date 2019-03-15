@@ -86,7 +86,7 @@ class Pmpage extends AppModel {
 			if(!$this->PmTotal->addPartner($data)) throw new Exception();
 			$datasource->commit();
 		}catch(Exception $e){
-			$this->log('Pmpage.php signUp error. '.print_r($e->getMessage(), true), 'emergency');
+			//$this->log('Pmpage.php signUp error. '.print_r($e->getMessage(), true), 'emergency');//よくある
 			$datasource->rollback();
 			return false;
 		}

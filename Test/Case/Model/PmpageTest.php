@@ -92,6 +92,7 @@ class PmpageTest extends BaserTestCase {
 			'invoice_address_1' => '',
 			'invoice_address_2' => '',
 			'invoice_email' => '',
+			'invoice_mail_notice' => 'no',
 			'memo' => '',
 			'other_payoff_name1' => '',
 			'other_payoff_total1' => '',

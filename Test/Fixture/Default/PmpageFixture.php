@@ -19,6 +19,7 @@ class PmpageFixture extends CakeTestFixture {
 			'invoice_email' => '',
 			'invoice_name' => 'テスト2',
 			'invoice_name2' => 'テスト3',
+			'invoice_mail_notice' => 'yes',
 			'created' => '2018-07-30 14:06:01',
 			'modified' => '2018-07-30 14:06:01'
 		),
@@ -39,6 +40,7 @@ class PmpageFixture extends CakeTestFixture {
 			'prefecture' => '東京',
 			'department_name' => '営業部',
 			'position_name' => '部長',
+			'invoice_mail_notice' => 'yes',
 			'created' => '2018-07-30 14:06:01',
 			'modified' => '2018-07-30 14:06:01'
 		),

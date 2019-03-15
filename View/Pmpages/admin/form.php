@@ -184,6 +184,13 @@
 			</td>
 		</tr>
 		<tr>
+			<th class="col-head" width="150">請求メール送信</th>
+			<td class="col-input">
+				<?php echo $this->BcForm->input('Pmpage.invoice_mail_notice', array('type'=>'select', 'options'=>['no'=>'no', 'yes'=>'yes'])) ?>
+				<?php echo $this->BcForm->error('Pmpage.invoice_mail_notice') ?>
+			</td>
+		</tr>
+		<tr>
 			<th colspan="2"></th>
 		</tr>
 		<tr>
