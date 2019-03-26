@@ -308,7 +308,8 @@ class Pmtotal extends AppModel {
     
     // curlを実行して配列で返す
     public function curlExec($url, $post_data, $headers = null){
-	    $fp = fopen(APP.'/tmp/curl.log', 'a');
+	    $date = date('Ym');
+	    $fp = fopen(APP.'/tmp/curl'.$date.'.log', 'a');
 	    $ch = curl_init();
 	    curl_setopt($ch, CURLOPT_VERBOSE, true);
 	    curl_setopt($ch, CURLOPT_STDERR, $fp);
