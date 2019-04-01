@@ -51,8 +51,9 @@
 
 <div class="section">
 <ul>
-	<li></li>
-	<li></li>
-	<li></li>
+	<li>run:請求中</li>
+	<li>close:入金済み</li>
+	<li>forward:次月繰越</li>
+	<li>delete:取り消し</li>
 </ul>
 </div>
