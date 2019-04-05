@@ -49,6 +49,7 @@ class PmtotalsController extends PointManagerAppController {
 	if($this->Pmpage->isNotPmpage($user['id'])) $this->redirect(array('plugin' => 'members', 'controller' => 'mypages', 'action' => 'index'));
 	$conditions = [];
 	$conditions[] = array('Pmtotal.mypage_id' => $user['id']);
+	$conditions[] = array('Pmtotal.status <>' => 'delete');
 	$this->paginate = array('conditions' => $conditions,
       'order' => 'Pmtotal.created ASC',
       'limit' => 20
