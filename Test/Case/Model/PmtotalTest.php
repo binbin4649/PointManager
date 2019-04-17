@@ -35,6 +35,7 @@ class PmtotalTest extends BaserTestCase {
     public function testPayOffMail(){
 	    $r = $this->Pmtotal->payOffMail();
 	    $this->assertEquals('submit', $r[0]['Pmtotal']['mail_submit']);
+	    $this->assertEquals('submit', $r[1]['Pmtotal']['mail_submit']);
     }
     
     public function testPmPayOffForward(){
@@ -52,6 +53,7 @@ class PmtotalTest extends BaserTestCase {
     public function testMfBillingsCreate(){
 	    $r = $this->Pmtotal->mfBillingsCreate();
 	    $this->assertEquals('test_id', $r[0]['data']['id']);
+	    $this->assertEquals('forward', $r[1]['data']['id']);
     }
     
     

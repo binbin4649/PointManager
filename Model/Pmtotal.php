@@ -129,7 +129,11 @@ class Pmtotal extends AppModel {
 		    $Pmtotal = $this->billingAddress($Pmtotal);
 		    foreach($mails as $mail){
 			    if(!Configure::read('MccPlugin.TEST_MODE')){
-				    $PointUserModel->sendEmail($mail, '請求書送付のご案内', $Pmtotal, array('template'=>'PointManager.invoice', 'layout'=>'default'));
+				    if($Pmtotal['Pmtotal']['status'] == 'forward'){
+					    $PointUserModel->sendEmail($mail, '請求繰越のご案内', $Pmtotal, array('template'=>'PointManager.forward', 'layout'=>'default'));
+				    }else{
+					    $PointUserModel->sendEmail($mail, '請求書送付のご案内', $Pmtotal, array('template'=>'PointManager.invoice', 'layout'=>'default'));
+				    }
 			    }
 		    }
 		    $Pmtotal['Pmtotal']['mail_submit'] = 'submit';
@@ -144,6 +148,10 @@ class Pmtotal extends AppModel {
     
     public function mfBillingsCreate(){
 	    $url = 'https://invoice.moneyforward.com/api/v2/billings';
+	    $document_name = Configure::read('NosPlugin.InvoiceDocumentName');
+	    if(empty($document_name)){
+		    $document_name = '請求書';
+	    }
 	    $res = [];
 	    $UserTotalModel = ClassRegistry::init('PointManager.UserTotal');
 	    $ym = date('Y-m-t');//今月末
@@ -156,25 +164,29 @@ class Pmtotal extends AppModel {
 		    ]
 	    ]);
 	    foreach($Pmtotals as $Pmtotal){
-		    $UserTotals = $UserTotalModel->find('all', [
-			    'conditions' => ['UserTotal.pmpage_id' => $Pmtotal['Pmpage']['id'], 'UserTotal.yyyymm' => $ym]
-		    ]);
-			$post_data = [];
-			$post_data['billing'] = [
-				'department_id' => $Pmtotal['Pmpage']['mf_department_id'],
-				'billing_number' => $Pmtotal['Pmtotal']['id'],
-				'billing_date' => $billing_date,
-				'due_date' => $due_date,
-				'document_name' => '請求書'
-			];
-			foreach($UserTotals as $UserTotal){
-				$post_data['billing']['items'][] = [
-					'name' => $UserTotal['UserTotal']['name'],
-					'quantity' => '1',
-					'unit_price' => $UserTotal['UserTotal']['total'],
+		    if($Pmtotal['Pmtotal']['status'] == 'forward'){
+			    $response['data']['id'] = 'forward';
+		    }else{
+			    $UserTotals = $UserTotalModel->find('all', [
+				    'conditions' => ['UserTotal.pmpage_id' => $Pmtotal['Pmpage']['id'], 'UserTotal.yyyymm' => $ym]
+			    ]);
+				$post_data = [];
+				$post_data['billing'] = [
+					'department_id' => $Pmtotal['Pmpage']['mf_department_id'],
+					'billing_number' => $Pmtotal['Pmtotal']['id'],
+					'billing_date' => $billing_date,
+					'due_date' => $due_date,
+					'document_name' => $document_name,
 				];
-			}
-			$response = $this->mfAccess($url, $post_data, true);
+				foreach($UserTotals as $UserTotal){
+					$post_data['billing']['items'][] = [
+						'name' => $UserTotal['UserTotal']['name'],
+						'quantity' => '1',
+						'unit_price' => $UserTotal['UserTotal']['total'],
+					];
+				}
+				$response = $this->mfAccess($url, $post_data, true);
+		    }
 			if(!empty($response['data']['id'])){
 			    $Pmtotal['Pmtotal']['mf_billing_id'] = $response['data']['id'];
 			    $this->create();

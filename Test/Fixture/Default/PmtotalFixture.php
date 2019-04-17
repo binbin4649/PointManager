@@ -28,6 +28,16 @@ class PmtotalFixture extends CakeTestFixture {
 				'mail_submit' => null,
 				'invoice_submit' => null,
 			],
+			[
+				'id' => 3,
+				'mypage_id' => 7,
+				'pmpage_id' => 7,
+				'yyyymm' => date('Y-m-t'),
+				'total' => 4000,
+				'status' => 'forward',
+				'mail_submit' => null,
+				'invoice_submit' => null,
+			],
 		];
 		parent::init();
 	}

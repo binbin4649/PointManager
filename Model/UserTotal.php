@@ -171,7 +171,7 @@ class UserTotal extends AppModel {
     
     public function forwardToUserTotal(){
 	    $PmtotalModel = ClassRegistry::init('PointManager.Pmtotal');
-	    $prev_ym = date('Y-m-d', strtotime('last day of previous month'));
+	    $prev_ym = date('Y-m-d', strtotime('last day of previous month'));//先月
 	    $ym = date('Y-m-t');//今月
 	    $UserTotals = [];
 	    $Pmtotals = $PmtotalModel->find('all', [
