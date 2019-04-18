@@ -11,7 +11,7 @@
 締め日：<?php echo $Pmtotal['yyyymm']."\n" ?>
 合計：<?php echo number_format($Pmtotal['total']) ?>円
 
-
+※明細は、マイページ「ポイント履歴」からCSVがダウンロードできますので、そちらでご確認お願いいたします。
 
 ---
 　<?php echo $mailConfig['site_name'] ?>　
