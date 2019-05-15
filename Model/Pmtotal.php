@@ -370,6 +370,10 @@ class Pmtotal extends AppModel {
 			    $this->log('Pmtotal.php getMfAccessToken MF API Error. '.print_r($new_token, true), 'emergency');
 			    return false;
 		    }
+		    if(empty($new_token['access_token']) or empty($new_token['refresh_token'])){
+			    $this->log('Pmtotal.php getMfAccessToken new token empty. '.print_r($new_token, true), 'emergency');
+			    return false;
+		    }
 		    $Pmconfig['Pmconfig']['access_token'] = $new_token['access_token'];
 		    $Pmconfig['Pmconfig']['refresh_token'] = $new_token['refresh_token'];
 		    $PmconfigModel->create();
