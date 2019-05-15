@@ -27,7 +27,7 @@ class UserTotal extends AppModel {
 	    $PointUserModel = ClassRegistry::init('Point.PointUser');
 	    $PmUsers = $PmUserModel->find('all', []);
 	    $ym = date('Y-m-t');//今月末
-	    $this_month = '('.date('m').'月分)';//今月名
+	    $this_month = '様('.date('m').'月分)';//今月名
 	    $UserTotals = [];
 	    foreach($PmUsers as $PmUser){
 		    $PointUser = $PointUserModel->findByMypageId($PmUser['Mypage']['id'], null, null, -1);
