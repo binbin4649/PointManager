@@ -47,7 +47,7 @@ class PmtotalTest extends BaserTestCase {
     
     public function testCreateInvoice(){
 	    $result = $this->Pmtotal->createInvoice();
-	    $this->assertEquals(23900, $result[0]['Pmtotal']['total']);
+	    $this->assertEquals(20770, $result[0]['Pmtotal']['total']);
     }
     
     public function testMfBillingsCreate(){
@@ -56,6 +56,17 @@ class PmtotalTest extends BaserTestCase {
 	    $this->assertEquals('forward', $r[1]['data']['id']);
     }
     
+    public function testUserTotalTotal(){
+	    $pmpage_id = 1;
+	    $result = $this->Pmtotal->userTotalTotal($pmpage_id);
+	    $this->assertEquals(600, $result);
+    }
+    
+    public function testUserTotalRun(){
+	    $pmpage_id = 1;
+	    $result = $this->Pmtotal->userTotalRun($pmpage_id);
+	    $this->assertEquals(2, $result[0]['UserTotal']['quantity']);
+    }
     
 /*
     public function testGetMfAccessToken(){

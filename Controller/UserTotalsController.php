@@ -14,7 +14,7 @@ class UserTotalsController extends PointManagerAppController {
 	$conditions = [];
 	$conditions[] = array('UserTotal.mypage_id' => $mypage_id);
 	$this->paginate = array('conditions' => $conditions,
-      'order' => 'UserTotal.created ASC',
+      'order' => 'UserTotal.created DESC',
       'limit' => 20
     );
     $UserTotals = $this->paginate('UserTotal');

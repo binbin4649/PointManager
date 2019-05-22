@@ -51,7 +51,7 @@ class PmtotalsController extends PointManagerAppController {
 	$conditions[] = array('Pmtotal.mypage_id' => $user['id']);
 	$conditions[] = array('Pmtotal.status <>' => 'delete');
 	$this->paginate = array('conditions' => $conditions,
-      'order' => 'Pmtotal.created ASC',
+      'order' => 'Pmtotal.created DESC',
       'limit' => 20
     );
     $Pmtotals = $this->paginate('Pmtotal');

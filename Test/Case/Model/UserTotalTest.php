@@ -40,7 +40,7 @@ class UserTotalTest extends BaserTestCase {
     
     public function testpmPayOff(){
 	    $result = $this->UserTotal->pmPayOff();
-	    $this->assertEquals(2000, $result[0]['UserTotal']['total']);
+	    $this->assertEquals(100, $result[0]['UserTotal']['total']);
     }
     
     public function testFromPmpageId(){
@@ -50,5 +50,11 @@ class UserTotalTest extends BaserTestCase {
 	    $this->assertEquals('1', $r[0]['UserTotal']['pmpage_id']);
     }
     
+    public function testItemPayOff(){
+	    $PmUserModel = ClassRegistry::init('PointManager.PmUser');
+	    $PmUser = $PmUserModel->findByMypageId(1);
+	    $r = $this->UserTotal->itemPayOff($PmUser);
+	    $this->assertEquals(100, $r[0]['UserTotal']['unit_price']);
+    }
 
 }

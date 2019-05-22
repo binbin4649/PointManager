@@ -48,7 +48,7 @@ class Pmtotal extends AppModel {
 	    $user_payoff = $UserTotalModel->userPayOff();//ユーザー単位の精算
 	    $pmpage_payoff = $UserTotalModel->pmPayOff();// pmpage自身のポイント精算
 	    $other_payoff = $UserTotalModel->otherPayOff();//その他の明細テーブル作る。月額保守費とか
-	    $result = $UserTotalModel->forwardToUserTotal();//繰越があったらuserTotal追加する
+	    //$result = $UserTotalModel->forwardToUserTotal();//繰越があったらuserTotal追加する
 	    $pm_payoff = $this->PmPayOff();// pmpage単位の精算
 	    $mail = $this->payOffMail();//請求書送付のご案内
 	    $billing = $this->mfBillingsCreate();//MFに請求書データ送る
@@ -60,7 +60,6 @@ class Pmtotal extends AppModel {
     public function PmPayOff(){
 	    $forwardPoint = Configure::read('pointManagerPlugin.forwardPoint');
 	    $PmpageModel = ClassRegistry::init('PointManager.Pmpage');
-	    $UserTotalModel = ClassRegistry::init('PointManager.UserTotal');
 	    $ym = date('Y-m-t');//今月
 	    $Pmtotals = [];
 	    $Pmpages = $PmpageModel->find('all', [
@@ -72,14 +71,7 @@ class Pmtotal extends AppModel {
 			    'conditions' => ['Pmtotal.pmpage_id'=>$Pmpage['Pmpage']['id'], 'Pmtotal.yyyymm'=>$ym]
 		    ]);
 		    if($overlapBan) continue;
-		    $total = 0;
-		    //ユーザー単位とその他の明細も合わせて取得
-		    $UserTotals = $UserTotalModel->find('all', [
-			    'conditions' => ['UserTotal.pmpage_id' => $Pmpage['Pmpage']['id'], 'UserTotal.yyyymm' => $ym]
-		    ]);
-			foreach($UserTotals as $UserTotal){
-				$total = $total + $UserTotal['UserTotal']['total'];
-			}
+			$total = $this->userTotalTotal($Pmpage['Pmpage']['id']);
 			//0円だったら生成しない
 			if($total == 0) continue;
 			//繰越判定
@@ -104,6 +96,44 @@ class Pmtotal extends AppModel {
 			}
 	    }
 	    return $Pmtotals;
+    }
+    
+    //締め前の合計金額を出す
+    public function userTotalTotal($pmpage_id){
+	    $total = 0;
+	    $UserTotalModel = ClassRegistry::init('PointManager.UserTotal');
+	    //ユーザー単位とその他の明細も合わせて取得
+	    $UserTotals = $UserTotalModel->find('all', [
+		    'conditions' => [
+		    	'UserTotal.pmpage_id' => $pmpage_id,
+		    	'UserTotal.status' => 'before'
+		    	//'UserTotal.yyyymm' => $ym
+		    ]
+	    ]);
+		foreach($UserTotals as $UserTotal){
+			$total = $total + $UserTotal['UserTotal']['total'];
+		}
+		return $total;
+    }
+    
+    // UserTotal status を全部runに、
+    public function userTotalRun($pmpage_id){
+	    $UserTotalModel = ClassRegistry::init('PointManager.UserTotal');
+	    $UserTotals = $UserTotalModel->find('all', [
+		    'conditions' => [
+		    	'UserTotal.pmpage_id' => $pmpage_id,
+		    	'UserTotal.status' => 'before'
+		    ]
+	    ]);
+	    foreach($UserTotals as $UserTotal){
+		    $UserTotalModel->create();
+		    $UserTotal['UserTotal']['status'] = 'run';
+		    if(!$UserTotalModel->save($UserTotal)){
+			    $this->log('Pmtotal.php userTotalRun save error. : '.print_r($UserTotal, true), 'emergency');
+			    return false;
+		    }
+	    }
+	    return $UserTotals;
     }
     
     public function payOffMail(){
@@ -153,7 +183,6 @@ class Pmtotal extends AppModel {
 		    $document_name = '請求書';
 	    }
 	    $res = [];
-	    $UserTotalModel = ClassRegistry::init('PointManager.UserTotal');
 	    $ym = date('Y-m-t');//今月末
 	    $billing_date = date('Y-m-d', strtotime('first day of next month'));//翌月1日
 	    $due_date = date('Y-m-d', strtotime('last day of next month'));//翌月末
@@ -167,9 +196,8 @@ class Pmtotal extends AppModel {
 		    if($Pmtotal['Pmtotal']['status'] == 'forward'){
 			    $response['data']['id'] = 'forward';
 		    }else{
-			    $UserTotals = $UserTotalModel->find('all', [
-				    'conditions' => ['UserTotal.pmpage_id' => $Pmtotal['Pmpage']['id'], 'UserTotal.yyyymm' => $ym]
-			    ]);
+			    // UserTotal status を全部runに、
+				$UserTotals = $this->userTotalRun($Pmtotal['Pmpage']['id']);
 				$post_data = [];
 				$post_data['billing'] = [
 					'department_id' => $Pmtotal['Pmpage']['mf_department_id'],
@@ -181,8 +209,8 @@ class Pmtotal extends AppModel {
 				foreach($UserTotals as $UserTotal){
 					$post_data['billing']['items'][] = [
 						'name' => $UserTotal['UserTotal']['name'],
-						'quantity' => '1',
-						'unit_price' => $UserTotal['UserTotal']['total'],
+						'quantity' => $UserTotal['UserTotal']['quantity'],
+						'unit_price' => $UserTotal['UserTotal']['unit_price'],
 					];
 				}
 				$response = $this->mfAccess($url, $post_data, true);

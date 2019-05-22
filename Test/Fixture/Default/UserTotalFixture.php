@@ -10,15 +10,21 @@ class UserTotalFixture extends CakeTestFixture {
 				'id' => 1,
 				'pmpage_id' => 1,
 				'yyyymm' => date('Y-m-t'),
+				'quantity' => 2,
+				'unit_price' => 100,
 				'total' => 200,
-				'name' => 'テスト'
+				'name' => 'テストテスト',
+				'status' => 'before'
 			],
 			[
 				'id' => 2,
 				'pmpage_id' => 1,
 				'yyyymm' => date('Y-m-t'),
+				'quantity' => 4,
+				'unit_price' => 100,
 				'total' => 400,
-				'name' => 'テスト'
+				'name' => 'テスト',
+				'status' => 'before'
 			],
 		];
 		parent::init();

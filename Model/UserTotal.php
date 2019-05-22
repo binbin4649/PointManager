@@ -26,42 +26,29 @@ class UserTotal extends AppModel {
 	    $PmUserModel = ClassRegistry::init('PointManager.PmUser');
 	    $PointUserModel = ClassRegistry::init('Point.PointUser');
 	    $PmUsers = $PmUserModel->find('all', []);
-	    $ym = date('Y-m-t');//今月末
-	    $this_month = '様('.date('m').'月分)';//今月名
 	    $UserTotals = [];
 	    foreach($PmUsers as $PmUser){
+		    $conf_total = 0;
 		    $PointUser = $PointUserModel->findByMypageId($PmUser['Mypage']['id'], null, null, -1);
 		    //ユーザー単位で、今月のマイナスポイントを精算、UserTotalを作成
 		    if($PointUser['PointUser']['point'] < 0){
-			    $datasource = $this->getDataSource();
-			    try{
-				    $datasource->begin();
-				    $total = abs($PointUser['PointUser']['point']);
-				    $UserTotal = [];
-				    $UserTotal['UserTotal'] = [
-					    'pm_user_id' => $PmUser['PmUser']['id'],
-					    'pmpage_id' => $PmUser['Pmpage']['id'],
-					    'mypage_id' => $PmUser['Mypage']['id'],
-					    'name' => $PmUser['Mypage']['name'].$this_month,
-					    'yyyymm' => $ym,
-					    'total' => $total
-				    ];
+			    $totals = $this->itemPayOff($PmUser);
+			    foreach($totals as $UserTotal){
 				    $UserTotals[] = $UserTotal;
-				    $this->create();
-				    if(!$this->save($UserTotal)) throw new Exception();
-				    $user_total_id = $this->getLastInsertId();
+				    $conf_total = $conf_total + $UserTotal['UserTotal']['total'];
+			    }
+			    $total = abs($PointUser['PointUser']['point']);
+			    //個別計算と合っているか？確認
+			    if($total == $conf_total){
 				    $point_add_data = [];
 				    $point_add_data = [
 				    	'mypage_id' => $PmUser['Mypage']['id'],
 				    	'point' => $total,
-				    	'reason' => 'invoice',
-				    	'reason_id' => $user_total_id
+				    	'reason' => 'invoice'
 				    ];
-				    if(!$PointUserModel->pointAdd($point_add_data)) throw new Exception();
-				    $datasource->commit();
-			    }catch(Exception $e){
-				    $datasource->rollback();
-				    $this->log('UserTotal.php UserPayOff error. : ');
+				    if(!$PointUserModel->pointAdd($point_add_data)){
+					    $this->log('UserTotal.php itemPayOff userPayOff pointAdd error. : '.print_r($point_add_data, true), 'emergency');
+				    }
 			    }
 		    }
 		    //退会しているユーザーが居たら、PmUserを削除
@@ -76,46 +63,80 @@ class UserTotal extends AppModel {
 	    }
     }
     
-    // Pmpage本人のPointも精算
+    //poinnt_books をpointとreasonごとに集計してUsertotalにする
+	public function itemPayOff($PmUser){
+		if(!empty($PmUser['Mypage']['id'])){
+			$mypage_id = $PmUser['Mypage']['id'];
+		}elseif(!empty($PmUser['Pmpage']['mypage_id'])){
+			$mypage_id = $PmUser['Pmpage']['mypage_id'];
+		}elseif(!empty($PmUser['PmUser']['mypage_id'])){
+			$mypage_id = $PmUser['PmUser']['mypage_id'];
+		}
+		if(!empty($PmUser['PmUser']['id'])){
+			$pm_user_id = $PmUser['PmUser']['id'];
+		}else{
+			$pm_user_id = null;
+		}
+		if(!empty($PmUser['Pmpage']['id'])){
+			$pmpage_id = $PmUser['Pmpage']['id'];
+		}elseif(!empty($PmUser['PmUser']['pmpage_id'])){
+			$pmpage_id = $PmUser['PmUser']['pmpage_id'];
+		}
+		$UserTotals = [];
+		$ym = date('Y-m-t');//今月末
+		$mypage_name = mb_substr($PmUser['Mypage']['name'], 0, 15);
+		$PointBookModel = ClassRegistry::init('Point.PointBook');
+		$monthlyTotal = $PointBookModel->monthlyTotalByPlan(null, [$mypage_id]);
+		foreach($monthlyTotal as $key=>$i){
+			$unit = explode(':', $key);
+			$this_month = '様('.date('m').'月:'.$unit[0].')';//今月名
+			$total = $unit[1] * $i;
+			$UserTotal['UserTotal'] = [
+			    'pm_user_id' => $pm_user_id,
+			    'pmpage_id' => $pmpage_id,
+			    'mypage_id' => $mypage_id,
+			    'name' => $mypage_name.$this_month,
+			    'yyyymm' => $ym,
+			    'quantity' => $i,
+			    'unit_price' => $unit[1],
+			    'total' => $total,
+			    'status' => 'before'
+		    ];
+		    $this->create();
+		    if(!$this->save($UserTotal)){
+			    $this->log('UserTotal.php itemPayOff save error. : '.print_r($UserTotal, true), 'emergency');
+		    }
+		    $UserTotals[] = $UserTotal;
+		}
+		return $UserTotals;
+	}
+    
+    // Pmpage本人のPointも精算、nosではこちらがメイン
     public function pmPayOff(){
 	    $PmpageModel = ClassRegistry::init('PointManager.Pmpage');
 	    $PointUserModel = ClassRegistry::init('Point.PointUser');
 	    $Pmpages = $PmpageModel->find('all', ['conditions' => ['Mypage.status <>' => '2']]);
-	    $ym = date('Y-m-t');//今月末
-	    $this_month = '('.date('m').'月分)';//今月名
 	    $UserTotals = [];
 	    foreach($Pmpages as $Pmpage){
+		    $conf_total = 0;
 		    $PointUser = $PointUserModel->findByMypageId($Pmpage['Pmpage']['mypage_id'], null, null, -1);
-		    //
 		    if($PointUser['PointUser']['point'] < 0){
-			    $datasource = $this->getDataSource();
-			    try{
-				    $datasource->begin();
-				    $total = abs($PointUser['PointUser']['point']);
-				    $UserTotal = [];
-				    $UserTotal['UserTotal'] = [
-					    'pmpage_id' => $Pmpage['Pmpage']['id'],
-					    'mypage_id' => $Pmpage['Pmpage']['mypage_id'],
-					    'name' => $Pmpage['Mypage']['name'].$this_month,
-					    'yyyymm' => $ym,
-					    'total' => $total
-				    ];
+			    $totals = $this->itemPayOff($Pmpage);
+			    foreach($totals as $UserTotal){
 				    $UserTotals[] = $UserTotal;
-				    $this->create();
-				    if(!$this->save($UserTotal)) throw new Exception();
-				    $user_total_id = $this->getLastInsertId();
+				    $conf_total = $conf_total + $UserTotal['UserTotal']['total'];
+			    }
+			    $total = abs($PointUser['PointUser']['point']);
+			    if($total == $conf_total){
 				    $point_add_data = [];
 				    $point_add_data = [
 				    	'mypage_id' => $Pmpage['Pmpage']['mypage_id'],
 				    	'point' => $total,
-				    	'reason' => 'invoice',
-				    	'reason_id' => $user_total_id
+				    	'reason' => 'invoice'
 				    ];
-				    if(!$PointUserModel->pointAdd($point_add_data)) throw new Exception();
-				    $datasource->commit();
-			    }catch(Exception $e){
-				    $datasource->rollback();
-				    $this->log('UserTotal.php pmPayOff error. : '.print_r($e->getMessage(), true), 'emergency');
+				    if(!$PointUserModel->pointAdd($point_add_data)){
+					    $this->log('UserTotal.php itemPayOff pmPayOff pointAdd error. : '.print_r($point_add_data, true), 'emergency');
+				    }
 			    }
 		    }
 	    }
@@ -142,9 +163,12 @@ class UserTotal extends AppModel {
 			    $UserTotal = [];
 			    $UserTotal['UserTotal'] = [
 				    'pmpage_id' => $Pmpage['Pmpage']['id'],
-				    'name' => $Pmpage['Pmpage']['other_payoff_name1'],
+				    'name' => $Pmpage['Pmpage']['other_payoff_name1'].'('.date('m').'月)',
 				    'yyyymm' => $ym,
-				    'total' => $Pmpage['Pmpage']['other_payoff_total1']
+				    'quantity' => 1,
+				    'unit_price' => $Pmpage['Pmpage']['other_payoff_total1'],
+				    'total' => $Pmpage['Pmpage']['other_payoff_total1'],
+				    'status' => 'before'
 			    ];
 			    $this->create();
 			    if($this->save($UserTotal)){
@@ -155,9 +179,12 @@ class UserTotal extends AppModel {
 			    $UserTotal = [];
 			    $UserTotal['UserTotal'] = [
 				    'pmpage_id' => $Pmpage['Pmpage']['id'],
-				    'name' => $Pmpage['Pmpage']['other_payoff_name2'],
+				    'name' => $Pmpage['Pmpage']['other_payoff_name2'].'('.date('m').'月)',
 				    'yyyymm' => $ym,
-				    'total' => $Pmpage['Pmpage']['other_payoff_total2']
+				    'quantity' => 1,
+				    'unit_price' => $Pmpage['Pmpage']['other_payoff_total2'],
+				    'total' => $Pmpage['Pmpage']['other_payoff_total2'],
+				    'status' => 'before'
 			    ];
 			    $this->create();
 			    if($this->save($UserTotal)){
@@ -169,6 +196,7 @@ class UserTotal extends AppModel {
     }
     
     
+    //きっと要らない
     public function forwardToUserTotal(){
 	    $PmtotalModel = ClassRegistry::init('PointManager.Pmtotal');
 	    $prev_ym = date('Y-m-d', strtotime('last day of previous month'));//先月

@@ -8,18 +8,24 @@
 	<table class="table">
 		<thead>
 			<tr>
-				<td>明細</td>
-				<td>金額</td>
+				<td> </td>
+				<td>単価</td>
+				<td>数量</td>
+				<td>価格</td>
 			</tr>
 		</thead>
 		<tbody>
 		<?php foreach($UserTotals as $UserTotal): ?>
 		<tr>
 			<td class="align-middle"><?php echo $UserTotal['UserTotal']['name'] ?></td>
+			<td class="align-middle"><?php echo $UserTotal['UserTotal']['unit_price'] ?></td>
+			<td class="align-middle"><?php echo $UserTotal['UserTotal']['quantity'] ?></td>
 			<td class="align-middle"><?php echo number_format($UserTotal['UserTotal']['total']) ?></td>
 		</tr>
 		<?php endforeach; ?>
 		<tr>
+			<td></td>
+			<td></td>
 			<td class="text-center">合計</td>
 			<td><?php echo number_format($Pmtotal['Pmtotal']['total']) ?></td>
 		</tr>
