@@ -21,6 +21,20 @@ class UserTotal extends AppModel {
 	    return $UserTotals;
     }
     
+    //未請求のUserTotalを返す
+    public function unFinish($pmpage_id){
+	    if(empty($pmpage_id)){
+		    return false;
+	    }
+	    $UserTotals = $this->find('all', [
+	    	'conditions' => [
+	    		'UserTotal.pmpage_id' => $pmpage_id,
+	    		'UserTotal.status' => 'before',
+	    	]
+	    ]);
+	    return $UserTotals;
+    }
+    
     //ユーザー単位に精算
     public function userPayOff(){
 	    $PmUserModel = ClassRegistry::init('PointManager.PmUser');
