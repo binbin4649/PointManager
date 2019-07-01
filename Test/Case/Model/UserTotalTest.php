@@ -57,4 +57,5 @@ class UserTotalTest extends BaserTestCase {
 	    $this->assertEquals(100, $r[0]['UserTotal']['unit_price']);
     }
 
+
 }
