@@ -79,7 +79,18 @@ class PmUser extends AppModel {
 	    $pmpage_id = $this->Pmpage->mypageToPmpage($data['Mypage']['id']);
 	    $PmUser['PmUser']['pmpage_id'] = $pmpage_id;
 	    $PmUser['PmUser']['mypage_id'] = $data['Pmpage']['add_user'];
-	    return $this->save($PmUser);
+	    $this->create();
+	    if($this->save($PmUser)){
+		    $this->PointUser = ClassRegistry::init('Point.PointUser');
+		    $PointUser = $this->PointUser->findByMypageId($data['Mypage']['id'], null, null, -1);
+		    $PointUser['PointUser']['pay_plan'] = 'pay_off';
+			$PointUser['PointUser']['invoice_plan'] = 'pm_month';
+			$this->PointUser->create();
+			if(!$this->PointUser->save($PointUser)){
+				$this->log('PmUser.php userTying error. '.print_r($PointUser, true), 'emergency');
+			}
+	    }
+	    return $PmUser;
     }
     
 
