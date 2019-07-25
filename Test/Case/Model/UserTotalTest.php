@@ -56,6 +56,15 @@ class UserTotalTest extends BaserTestCase {
 	    $r = $this->UserTotal->itemPayOff($PmUser);
 	    $this->assertEquals(100, $r[0]['UserTotal']['unit_price']);
     }
+    
+    public function testTotalDiff(){
+	    $total = '500';
+	    $conf_total = '700';
+	    $Pmpage['Pmpage']['id'] = '1';
+	    $Pmpage['Pmpage']['mypage_id'] = '1';
+	    $r = $this->UserTotal->totalDiff($total, $conf_total, $Pmpage);
+		$this->assertEquals('-200', $r['UserTotal']['total']);
+    }
 
 
 }

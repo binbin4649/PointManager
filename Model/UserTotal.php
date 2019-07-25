@@ -38,17 +38,17 @@ class UserTotal extends AppModel {
 				    $conf_total = $conf_total + $UserTotal['UserTotal']['total'];
 			    }
 			    $total = abs($PointUser['PointUser']['point']);
-			    //個別計算と合っているか？確認
-			    if($total == $conf_total){
-				    $point_add_data = [];
-				    $point_add_data = [
-				    	'mypage_id' => $PmUser['Mypage']['id'],
-				    	'point' => $total,
-				    	'reason' => 'invoice'
-				    ];
-				    if(!$PointUserModel->pointAdd($point_add_data)){
-					    $this->log('UserTotal.php itemPayOff userPayOff pointAdd error. : '.print_r($point_add_data, true), 'emergency');
-				    }
+			    if($total != $conf_total){
+				    $this->totalDiff($total, $conf_total, $PmUser);
+			    }
+			    $point_add_data = [];
+			    $point_add_data = [
+			    	'mypage_id' => $PmUser['Mypage']['id'],
+			    	'point' => $total,
+			    	'reason' => 'invoice'
+			    ];
+			    if(!$PointUserModel->pointAdd($point_add_data)){
+				    $this->log('UserTotal.php itemPayOff userPayOff pointAdd error. : '.print_r($point_add_data, true), 'emergency');
 			    }
 		    }
 		    //退会しているユーザーが居たら、PmUserを削除
@@ -88,9 +88,13 @@ class UserTotal extends AppModel {
 		$PointBookModel = ClassRegistry::init('Point.PointBook');
 		$monthlyTotal = $PointBookModel->monthlyTotalByPlan(null, [$mypage_id]);
 		foreach($monthlyTotal as $key=>$i){
+			$UserTotal = [];
 			$unit = explode(':', $key);
 			$this_month = '様('.date('m').'月:'.$unit[0].')';//今月名
 			$total = $unit[1] * $i;
+			if($total == 0){
+				continue;
+			}
 			$UserTotal['UserTotal'] = [
 			    'pm_user_id' => $pm_user_id,
 			    'pmpage_id' => $pmpage_id,
@@ -111,6 +115,49 @@ class UserTotal extends AppModel {
 		return $UserTotals;
 	}
     
+    //差額分のitemを追加
+    public function totalDiff($total, $conf_total, $Pmpage){
+	    if(!empty($Pmpage['Mypage']['id'])){
+			$mypage_id = $Pmpage['Mypage']['id'];
+		}elseif(!empty($Pmpage['Pmpage']['mypage_id'])){
+			$mypage_id = $Pmpage['Pmpage']['mypage_id'];
+		}elseif(!empty($Pmpage['PmUser']['mypage_id'])){
+			$mypage_id = $Pmpage['PmUser']['mypage_id'];
+		}
+		if(!empty($Pmpage['PmUser']['pmpage_id'])){
+			$pmpage_id = $Pmpage['PmUser']['pmpage_id'];
+		}elseif(!empty($Pmpage['Pmpage']['id'])){
+			$pmpage_id = $Pmpage['Pmpage']['id'];
+		}
+		if(!empty($Pmpage['PmUser']['id'])){
+			$pm_user_id = $Pmpage['PmUser']['id'];
+		}else{
+			$pm_user_id = null;
+		}
+	    // conf = item
+	    //itemの方が大きければ減算、totalが大きければ乗算
+	    $diff = $total - $conf_total;
+	    $ym = date('Y-m-t');//今月末
+	    $UserTotal = [];
+	    $UserTotal['UserTotal'] = [
+		    'pm_user_id' => $pm_user_id,
+		    'pmpage_id' => $pmpage_id,
+		    'mypage_id' => $mypage_id,
+		    'name' => '差額調整',
+		    'yyyymm' => $ym,
+		    'quantity' => '1',
+		    'unit_price' => $diff,
+		    'total' => $diff,
+		    'status' => 'before'
+	    ];
+	    $this->create();
+	    $UserTotal = $this->save($UserTotal);
+	    if(!$UserTotal){
+		    $this->log('UserTotal.php totalDiff save error. : '.print_r($UserTotal, true), 'emergency');
+	    }
+	    return $UserTotal;
+    }
+    
     // Pmpage本人のPointも精算、nosではこちらがメイン
     public function pmPayOff(){
 	    $PmpageModel = ClassRegistry::init('PointManager.Pmpage');
@@ -127,16 +174,17 @@ class UserTotal extends AppModel {
 				    $conf_total = $conf_total + $UserTotal['UserTotal']['total'];
 			    }
 			    $total = abs($PointUser['PointUser']['point']);
-			    if($total == $conf_total){
-				    $point_add_data = [];
-				    $point_add_data = [
-				    	'mypage_id' => $Pmpage['Pmpage']['mypage_id'],
-				    	'point' => $total,
-				    	'reason' => 'invoice'
-				    ];
-				    if(!$PointUserModel->pointAdd($point_add_data)){
-					    $this->log('UserTotal.php itemPayOff pmPayOff pointAdd error. : '.print_r($point_add_data, true), 'emergency');
-				    }
+			    if($total != $conf_total){
+				    $this->totalDiff($total, $conf_total, $Pmpage);
+			    }
+			    $point_add_data = [];
+			    $point_add_data = [
+			    	'mypage_id' => $Pmpage['Pmpage']['mypage_id'],
+			    	'point' => $total,
+			    	'reason' => 'invoice'
+			    ];
+			    if(!$PointUserModel->pointAdd($point_add_data)){
+				    $this->log('UserTotal.php itemPayOff pmPayOff pointAdd error. : '.print_r($point_add_data, true), 'emergency');
 			    }
 		    }
 	    }

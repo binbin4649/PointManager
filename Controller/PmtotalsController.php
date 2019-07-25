@@ -46,7 +46,10 @@ class PmtotalsController extends PointManagerAppController {
   
   public function index(){
 	$user = $this->BcAuth->user();
-	if($this->Pmpage->isNotPmpage($user['id'])) $this->redirect(array('plugin' => 'members', 'controller' => 'mypages', 'action' => 'index'));
+	if($this->Pmpage->isNotPmpage($user['id'])){
+		$this->setMessage('請求先に指定されているアカウントのみ参照できます。', true);
+		$this->redirect(array('plugin' => 'members', 'controller' => 'mypages', 'action' => 'index'));
+	}
 	$conditions = [];
 	$conditions[] = array('Pmtotal.mypage_id' => $user['id']);
 	$conditions[] = array('Pmtotal.status <>' => 'delete');
