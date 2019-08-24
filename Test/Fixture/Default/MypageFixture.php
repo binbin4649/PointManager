@@ -79,6 +79,16 @@ class MypageFixture extends CakeTestFixture {
 			'created' => '2018-07-30 14:06:01',
 			'modified' => '2018-07-30 14:06:01'
 		),
+		array(
+			'id' => 8,
+			'name' => 'テスト8',
+			'username' => 'binbin4649+dev8@gmail.com',
+			'status' => '0',
+			'password' => 'fbcf5055496900b9b62caa77a0ddbd9e0e622dbe',
+			'email' => 'binbin4649+dev8@gmail.com',
+			'created' => '2018-07-30 14:06:01',
+			'modified' => '2018-07-30 14:06:01'
+		),
 	);
 
 }

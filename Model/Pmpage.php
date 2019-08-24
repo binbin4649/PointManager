@@ -115,6 +115,7 @@ class Pmpage extends AppModel {
 		$data['Mypage']['name'] = $Mypage['Mypage']['name'];
 		$data['Mypage']['email'] = $Mypage['Mypage']['email'];
 		unset($Mypage['Mypage']['password']);
+		$this->Mylog = ClassRegistry::init('Members.Mylog');
 		$this->PmTotal = ClassRegistry::init('PointManager.Pmtotal');
 		$this->PointUser = ClassRegistry::init('Point.PointUser');
 		$PointUser = $this->PointUser->findByMypageId($data['Mypage']['id'], null, null, -1);
@@ -150,6 +151,7 @@ class Pmpage extends AppModel {
 			$this->log('Pmpage.php toAss error. '.print_r($e->getMessage(), true), 'emergency');
 			return false;
 		}
+		$this->Mylog->record($data['Mypage']['id'], 'to_assosiate');
 		return $data;
 	}
     

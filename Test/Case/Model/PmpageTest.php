@@ -30,7 +30,10 @@ class PmpageTest extends BaserTestCase {
 	    $Plugin = ClassRegistry::init('Plugin');
 	    $lists = $Plugin->find('list');
 	    foreach($lists as $list){
-		    if($list == 'Nos') $fixtures[] = 'plugin.point_manager.Default/NosUser';
+		    if($list == 'Nos'){
+			    $fixtures[] = 'plugin.point_manager.Default/NosUser';
+			    $fixtures[] = 'plugin.point_manager.Default/NosCall';
+		    }
 	    }
 	    $this->fixtures = $fixtures;
     }

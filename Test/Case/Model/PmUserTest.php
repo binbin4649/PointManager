@@ -50,6 +50,13 @@ class PmUserTest extends BaserTestCase {
 	    $r = $this->PmUser->isExtUserTying($data);
 	    $this->assertTrue($r);
     }
+    
+    public function testUserTying(){
+	    $data['Mypage']['id'] = '8';
+	    $data['Pmpage']['add_user'] = '6';
+	    $r = $this->PmUser->userTying($data);
+		$this->assertEquals('8', $r['PmUser']['pmpage_id']);
+    }
 
 /*
     public function testValidateFalse(){
