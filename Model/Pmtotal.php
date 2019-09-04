@@ -179,6 +179,7 @@ class Pmtotal extends AppModel {
     public function mfBillingsCreate(){
 	    $url = 'https://invoice.moneyforward.com/api/v2/billings';
 	    $document_name = Configure::read('NosPlugin.InvoiceDocumentName');
+	    $title = Configure::read('NosPlugin.InvoiceTitle');
 	    if(empty($document_name)){
 		    $document_name = '請求書';
 	    }
@@ -205,12 +206,14 @@ class Pmtotal extends AppModel {
 					'billing_date' => $billing_date,
 					'due_date' => $due_date,
 					'document_name' => $document_name,
+					'title' => $title,
 				];
 				foreach($UserTotals as $UserTotal){
 					$post_data['billing']['items'][] = [
 						'name' => $UserTotal['UserTotal']['name'],
 						'quantity' => $UserTotal['UserTotal']['quantity'],
 						'unit_price' => $UserTotal['UserTotal']['unit_price'],
+						'excise' => false
 					];
 				}
 				$response = $this->mfAccess($url, $post_data, true);
