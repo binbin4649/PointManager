@@ -36,7 +36,7 @@
 			<th class="col-head" width="150">明細</th>
 			<td class="col-input">
 				<?php foreach($UserTotals as $total): ?>
-					<?php echo $total['UserTotal']['name'].' : '.$total['UserTotal']['total']; ?><br>
+					<?php echo $total['UserTotal']['name'].' : '.$total['UserTotal']['quantity'].' : '.$total['UserTotal']['unit_price'].' : '.$total['UserTotal']['total']; ?><br>
 				<?php endforeach; ?>
 			</td>
 		</tr>
