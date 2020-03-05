@@ -68,6 +68,20 @@ class PmtotalTest extends BaserTestCase {
 	    $this->assertEquals(2, $result[0]['UserTotal']['quantity']);
     }
     
+    public function testDueDateNextMonth(){
+	    $mypage_id = 1;
+	    $r = $this->Pmtotal->dueDateNextMonth($mypage_id);
+	    $date = date('Y-m-d', strtotime('last day of next month'));
+	    $this->assertEquals($date, $r);
+    }
+    
+    public function testDueDateNextNextMonth(){
+	    $mypage_id = 193;
+	    $r = $this->Pmtotal->dueDateNextMonth($mypage_id);
+	    $date = date('Y-m-d', strtotime('last day of 2 month'));
+	    $this->assertEquals($date, $r);
+    }
+    
 /*
     public function testGetMfAccessToken(){
 	    $data['Pmpage'] = [

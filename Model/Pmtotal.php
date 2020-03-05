@@ -176,17 +176,33 @@ class Pmtotal extends AppModel {
 	    return $return;
     }
     
+    // 会社によって支払日が違う
+    public function dueDateNextMonth($mypage_id){
+	    $Invoice2Month = Configure::read('NosPlugin.Invoice2Month');
+	    $due_date = '';
+	    foreach($Invoice2Month as $id){
+		    if($mypage_id == $id){
+			    $due_date = date('Y-m-d', strtotime('last day of 2 month'));//翌々月末
+		    }
+	    }
+	    if(empty($due_date)){
+		    $due_date = date('Y-m-d', strtotime('last day of next month'));//翌月末
+	    }
+	    return $due_date;
+    }
+    
     public function mfBillingsCreate(){
 	    $url = 'https://invoice.moneyforward.com/api/v2/billings';
 	    $document_name = Configure::read('NosPlugin.InvoiceDocumentName');
 	    $title = Configure::read('NosPlugin.InvoiceTitle');
+	    
 	    if(empty($document_name)){
 		    $document_name = '請求書';
 	    }
 	    $res = [];
 	    $ym = date('Y-m-t');//今月末
 	    $billing_date = date('Y-m-d', strtotime('first day of next month'));//翌月1日
-	    $due_date = date('Y-m-d', strtotime('last day of next month'));//翌月末
+	    
 	    $Pmtotals = $this->find('all', [
 		    'conditions' => [
 			    'Pmtotal.yyyymm' => $ym,
@@ -197,6 +213,7 @@ class Pmtotal extends AppModel {
 		    if($Pmtotal['Pmtotal']['status'] == 'forward'){
 			    $response['data']['id'] = 'forward';
 		    }else{
+			    $due_date = $this->dueDateNextMonth($Pmtotal['Pmtotal']['mypage_id']);
 			    // UserTotal status を全部runに、
 				$UserTotals = $this->userTotalRun($Pmtotal['Pmpage']['id']);
 				$post_data = [];
