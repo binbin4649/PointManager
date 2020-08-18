@@ -76,6 +76,7 @@ class PmtotalTest extends BaserTestCase {
     }
     
     public function testDueDateNextNextMonth(){
+	    Configure::write('NosPlugin.Invoice2Month', ['193']);
 	    $mypage_id = 193;
 	    $r = $this->Pmtotal->dueDateNextMonth($mypage_id);
 	    $date = date('Y-m-d', strtotime('last day of 2 month'));

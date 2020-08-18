@@ -180,9 +180,11 @@ class Pmtotal extends AppModel {
     public function dueDateNextMonth($mypage_id){
 	    $Invoice2Month = Configure::read('NosPlugin.Invoice2Month');
 	    $due_date = '';
-	    foreach($Invoice2Month as $id){
-		    if($mypage_id == $id){
-			    $due_date = date('Y-m-d', strtotime('last day of 2 month'));//翌々月末
+	    if(!empty($Invoice2Month)){
+		    foreach($Invoice2Month as $id){
+			    if($mypage_id == $id){
+				    $due_date = date('Y-m-d', strtotime('last day of 2 month'));//翌々月末
+			    }
 		    }
 	    }
 	    if(empty($due_date)){
