@@ -50,8 +50,8 @@ class Pmtotal extends AppModel {
 	    $other_payoff = $UserTotalModel->otherPayOff();//その他の明細テーブル作る。月額保守費とか
 	    //$result = $UserTotalModel->forwardToUserTotal();//繰越があったらuserTotal追加する
 	    $pm_payoff = $this->PmPayOff();// pmpage単位の精算
-	    $mail = $this->payOffMail();//請求書送付のご案内
 	    $billing = $this->mfBillingsCreate();//MFに請求書データ送る
+	    $mail = $this->payOffMail();//請求書送付のご案内
 	    return $mail;
     }
     
@@ -137,7 +137,7 @@ class Pmtotal extends AppModel {
     }
     
     public function payOffMail(){
-	    $PointUserModel = ClassRegistry::init('Point.PointUser');
+	    $MypageModel = ClassRegistry::init('Members.Mypage');
 	    $return = [];
 	    $ym = date('Y-m-t');//今月末
 	    $Pmtotals = $this->find('all', [
@@ -160,9 +160,14 @@ class Pmtotal extends AppModel {
 		    foreach($mails as $mail){
 			    if(!Configure::read('MccPlugin.TEST_MODE')){
 				    if($Pmtotal['Pmtotal']['status'] == 'forward'){
-					    $PointUserModel->sendEmail($mail, '請求繰越のご案内', $Pmtotal, array('template'=>'PointManager.forward', 'layout'=>'default'));
+					    $MypageModel->sendEmail($mail, '請求繰越のご案内', $Pmtotal, array('template'=>'PointManager.forward', 'layout'=>'default'));
 				    }else{
-					    $PointUserModel->sendEmail($mail, '請求書送付のご案内', $Pmtotal, array('template'=>'PointManager.invoice', 'layout'=>'default'));
+					    $options = [
+						    'template' => 'PointManager.invoice',
+						    'layout' => 'default',
+						    'attachments' => $this->billingPdfPath($Pmtotal['Pmtotal']['id']),
+					    ];
+					    $MypageModel->sendEmail($mail, '請求書送付のご案内', $Pmtotal, $options);
 				    }
 			    }
 		    }
@@ -243,6 +248,7 @@ class Pmtotal extends AppModel {
 			    if(!$this->save($Pmtotal)){
 				    $this->log('Pmtotal.php mfBillingsCreate error3. '.print_r($Pmtotal, true), 'emergency');
 			    }
+			    $this->billingPdf($response['data']['id'], $Pmtotal['Pmtotal']['id']);
 		    }else{
 			    $this->log('Pmtotal.php mfBillingsCreate error2. '.print_r($response, true), 'emergency');
 			    $this->log('Pmtotal.php mfBillingsCreate error. '.print_r($post_data, true), 'emergency');
@@ -366,6 +372,32 @@ class Pmtotal extends AppModel {
 		    $post_data = array_merge($before_data, $post_data);
 	    }
 	    return $this->curlExec($url, $post_data, $headers);
+    }
+    
+    public function billingPdfPath($pmtotal_id){
+	    $path = APP.'Plugin/PointManager/webroot/files/pdf/invoice-'.$pmtotal_id.'.pdf';
+	    return $path;
+    }
+    
+    public function billingPdf($billing_id, $pmtotal_id){
+	    if(Configure::read('MccPlugin.TEST_MODE')){
+		    return true;
+	    }
+	    $path = $this->billingPdfPath($pmtotal_id);
+	    $url = 'https://invoice.moneyforward.com/api/v1/billings/'.$billing_id.'.pdf';
+	    $Pmconfig = $this->getMfAccessToken();
+	    $headers = [
+		    'Authorization: BEARER '.$Pmconfig['access_token']
+	    ];
+	    $fp = fopen($path, 'w+');
+	    $ch = curl_init();
+	    curl_setopt($ch, CURLOPT_URL, $url);
+	    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+	    curl_setopt($ch, CURLOPT_FILE, $fp);
+	    $return = curl_exec($ch);
+		curl_close($ch);
+		fclose($fp);
+	    return $return;
     }
     
     // curlを実行して配列で返す

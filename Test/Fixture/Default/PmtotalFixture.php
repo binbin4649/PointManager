@@ -27,6 +27,7 @@ class PmtotalFixture extends CakeTestFixture {
 				'status' => 'run',
 				'mail_submit' => null,
 				'invoice_submit' => null,
+				'mf_billing_id' => null,
 			],
 			[
 				'id' => 3,

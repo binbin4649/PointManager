@@ -24,6 +24,21 @@ class PmtotalTest extends BaserTestCase {
 	    parent::tearDown();
     }
     
+    public function testBillingPdfPath(){
+	    $pmtotal_id = '70';
+	    $result = $this->Pmtotal->billingPdfPath($pmtotal_id);
+	    $this->assertEquals(APP.'Plugin/PointManager/webroot/files/pdf/invoice-70.pdf', $result);
+    }
+    
+/*
+    public function testBillingPdf(){
+	    $billing_id = 'kSplMFj3N70_7GHKy_Nkzw';
+	    $pmtotal_id = '70';
+	    $r = $this->Pmtotal->billingPdf($billing_id, $pmtotal_id);
+	    var_dump($r);
+	    die;
+    }
+*/
     
     public function testPmPayOff(){
 	    Configure::write('pointManagerPlugin.forwardPoint', 100);
@@ -33,6 +48,7 @@ class PmtotalTest extends BaserTestCase {
     }
     
     public function testPayOffMail(){
+	    //Configure::write('MccPlugin.TEST_MODE', false);
 	    $r = $this->Pmtotal->payOffMail();
 	    $this->assertEquals('submit', $r[0]['Pmtotal']['mail_submit']);
 	    $this->assertEquals('submit', $r[1]['Pmtotal']['mail_submit']);
