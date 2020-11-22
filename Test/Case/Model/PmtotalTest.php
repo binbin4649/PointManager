@@ -40,6 +40,11 @@ class PmtotalTest extends BaserTestCase {
     }
 */
     
+    public function testFilesPdfIsWritable(){
+	    $r = is_writable(APP.'Plugin/PointManager/webroot/files/pdf/');
+	    $this->assertTrue($r);
+    }
+    
     public function testPmPayOff(){
 	    Configure::write('pointManagerPlugin.forwardPoint', 100);
 	    $result = $this->Pmtotal->PmPayOff();
