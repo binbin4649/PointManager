@@ -1,2 +1,4 @@
 vendor/*
 composer.lock
+webroot/files/pdf/*
+!webroot/files/pdf/dummy
