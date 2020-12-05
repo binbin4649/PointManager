@@ -38,6 +38,14 @@
 		</tbody>
 	</table>
 </div>
+<div class="my-3 mx-sm-5 text-right">
+	<?php if($Pmtotal['Pmtotal']['status'] != 'forward'): ?>
+		<?php 
+			$file_name = 'invoice-'.$Pmtotal['Pmtotal']['id'].'.pdf';
+			echo $this->BcBaser->link('請求書PDFダウンロード', '/point_manager/files/pdf/'.$file_name, ['download'=>$file_name]); 
+		?>
+	<?php endif; ?>
+</div>
 <div class="my-3 mx-sm-5 text-center">
 	<?php echo $this->BcBaser->link('請求履歴一覧へ', '/point_manager/pmtotals/', ['class'=>'btn btn-outline-primary btn-e', 'role'=>'button']) ?>
 </div>
