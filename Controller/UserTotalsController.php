@@ -31,6 +31,7 @@ class UserTotalsController extends PointManagerAppController {
 	$Pmtotal = $this->Pmtotal->fromPmpageId($pmpage_id, $ym);
 	$this->set('UserTotals', $UserTotals);
 	$this->set('Pmtotal', $Pmtotal);
+	$this->set('pdf_file', $this->UserTotal->pdfExists($Pmtotal['Pmtotal']['id']));
   }
 
 }

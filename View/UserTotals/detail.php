@@ -39,10 +39,9 @@
 	</table>
 </div>
 <div class="my-3 mx-sm-5 text-right">
-	<?php if($Pmtotal['Pmtotal']['status'] != 'forward'): ?>
+	<?php if($pdf_file): ?>
 		<?php 
-			$file_name = 'invoice-'.$Pmtotal['Pmtotal']['id'].'.pdf';
-			echo $this->BcBaser->link('請求書PDFダウンロード', '/point_manager/files/pdf/'.$file_name, ['download'=>$file_name]); 
+			echo $this->BcBaser->link('請求書PDFダウンロード', '/point_manager/files/pdf/'.$pdf_file, ['download'=>$pdf_file]); 
 		?>
 	<?php endif; ?>
 </div>

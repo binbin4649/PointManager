@@ -22,6 +22,17 @@ class UserTotalTest extends BaserTestCase {
 	    parent::tearDown();
     }
     
+    public function testPdfExistsFalse(){
+	    $pmtotal_id = '2';
+	    $result = $this->UserTotal->pdfExists($pmtotal_id);
+	    $this->assertFalse($result);
+    }
+    
+    public function testPdfExists(){
+	    $pmtotal_id = '1';
+	    $result = $this->UserTotal->pdfExists($pmtotal_id);
+	    $this->assertEquals('invoice-1.pdf', $result);
+    }
     
     public function testUserPayOff(){
 	    $result = $this->UserTotal->userPayOff();

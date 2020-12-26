@@ -243,6 +243,16 @@ class UserTotal extends AppModel {
 	    return $UserTotals;
     }
     
+    // 請求書PDFがあるか確認
+    public function pdfExists($pmtotal_id){
+	    $file_name = 'invoice-'.$pmtotal_id.'.pdf';
+	    $file_path = APP.'Plugin/PointManager/webroot/files/pdf/';
+	    if(file_exists($file_path.$file_name)){
+		    return $file_name;
+	    }
+	    return false;
+    }
+    
     
     //きっと要らない
     public function forwardToUserTotal(){
