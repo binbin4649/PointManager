@@ -6,6 +6,14 @@
 			<th colspan="2">MFクラウド請求書APIの情報</th>
 		</tr>
 		<tr>
+			<th class="col-head" width="150">created<br>modified</th>
+			<td class="col-input">
+				<?php echo $this->request->data['Pmconfig']['created'] ?><br>
+				<?php echo $this->request->data['Pmconfig']['modified'] ?>
+			</td>
+			</td>
+		</tr>
+		<tr>
 			<th class="col-head" width="150">client_id</th>
 			<td class="col-input">
 				<?php echo $this->BcForm->input('Pmconfig.client_id', array('type'=>'text')) ?>
