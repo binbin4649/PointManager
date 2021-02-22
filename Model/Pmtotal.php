@@ -202,14 +202,12 @@ class Pmtotal extends AppModel {
 	    $url = 'https://invoice.moneyforward.com/api/v2/billings';
 	    $document_name = Configure::read('NosPlugin.InvoiceDocumentName');
 	    $title = Configure::read('NosPlugin.InvoiceTitle');
-	    
 	    if(empty($document_name)){
 		    $document_name = '請求書';
 	    }
 	    $res = [];
 	    $ym = date('Y-m-t');//今月末
 	    $billing_date = date('Y-m-d', strtotime('first day of next month'));//翌月1日
-	    
 	    $Pmtotals = $this->find('all', [
 		    'conditions' => [
 			    'Pmtotal.yyyymm' => $ym,

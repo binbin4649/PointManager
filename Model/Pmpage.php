@@ -34,6 +34,13 @@ class Pmpage extends AppModel {
         ),
     );
 	
+	
+	public function numbersOnly($data){
+	    $data = mb_convert_kana($data, 'n');
+	    $data = preg_replace('/[^0-9]/', '', $data);
+	    return $data;
+    }
+	
 	// Pmpage に mypage_id があるか、無かったらtrue
 	public function isNotPmpage($mypage_id){
 		if($this->findByMypageId($mypage_id, null, null, -1)){
@@ -53,7 +60,7 @@ class Pmpage extends AppModel {
 		$data['Mypage']['username'] = $data['Mypage']['email'];
 		$data['Mypage']['password_confirm'] = $data['Mypage']['password'];
 		$data['Mypage']['status'] = 0;
-		//$PmtotalModel = ClassRegistry::init('PointManager.Pmtotal');
+		$data['Mypage']['tel'] = $this->numbersOnly($data['Mypage']['tel']);
 		$this->PmTotal = ClassRegistry::init('PointManager.Pmtotal');
 		$this->Mylog = ClassRegistry::init('Members.Mylog');
 		$this->PointUser = ClassRegistry::init('Point.PointUser');
@@ -64,6 +71,38 @@ class Pmpage extends AppModel {
 			$datasource->begin();
 			// Mypage 
 			$this->Mypage->create();
+			$this->Mypage->validator()->add(
+				'tel', [
+					'notBlank' => [
+						'rule' => ['notBlank'],
+						'message' => '電話番号を入力してください。'
+					],
+					'minLength' => [
+						'rule' => ['minLength', 10],
+						'message' => '最低10桁'
+					],
+					'maxLength' => [
+						'rule' => ['maxLength', 16],
+						'message' => '最大16桁'
+					]
+				]
+			);
+			$this->Mypage->validator()->add(
+				'zip', [
+					'notBlank' => [
+						'rule' => ['notBlank'],
+						'message' => '入力してください。'
+					]
+				]
+			);
+			$this->Mypage->validator()->add(
+				'address_1', [
+					'notBlank' => [
+						'rule' => ['notBlank'],
+						'message' => '入力してください。'
+					]
+				]
+			);
 			if(!$this->Mypage->save($data)) throw new Exception();
 			$mypage_id = $this->Mypage->getLastInsertID();
 			$data['Pmpage']['mypage_id'] = $mypage_id;
