@@ -15,8 +15,10 @@ class PmtotalFixture extends CakeTestFixture {
 				'status' => 'forward',
 				'mail_submit' => '',
 				'invoice_submit' => '',
-				'payment_date' => '',
+				'payment_date' => null,
 				'mf_billing_id' => '',
+				'created' => '2018-07-30 14:06:01',
+				'modified' => '2018-07-30 14:06:01'
 			],
 			[
 				'id' => 2,
@@ -28,6 +30,8 @@ class PmtotalFixture extends CakeTestFixture {
 				'mail_submit' => null,
 				'invoice_submit' => null,
 				'mf_billing_id' => null,
+				'created' => '2018-07-30 14:06:01',
+				'modified' => '2018-07-30 14:06:01'
 			],
 			[
 				'id' => 3,
@@ -38,6 +42,8 @@ class PmtotalFixture extends CakeTestFixture {
 				'status' => 'forward',
 				'mail_submit' => null,
 				'invoice_submit' => null,
+				'created' => '2018-07-30 14:06:01',
+				'modified' => '2018-07-30 14:06:01'
 			],
 		];
 		parent::init();

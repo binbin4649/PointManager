@@ -14,7 +14,9 @@ class UserTotalFixture extends CakeTestFixture {
 				'unit_price' => 100,
 				'total' => 200,
 				'name' => 'テストテスト',
-				'status' => 'before'
+				'status' => 'before',
+				'created' => '2018-07-30 14:06:01',
+				'modified' => '2018-07-30 14:06:01'
 			],
 			[
 				'id' => 2,
@@ -24,7 +26,9 @@ class UserTotalFixture extends CakeTestFixture {
 				'unit_price' => 100,
 				'total' => 400,
 				'name' => 'テスト',
-				'status' => 'before'
+				'status' => 'before',
+				'created' => '2018-07-30 14:06:01',
+				'modified' => '2018-07-30 14:06:01'
 			],
 		];
 		parent::init();

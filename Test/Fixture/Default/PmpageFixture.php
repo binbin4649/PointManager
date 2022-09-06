@@ -15,7 +15,7 @@ class PmpageFixture extends CakeTestFixture {
 			'other_payoff_name1' => '月額保守費',
 			'other_payoff_total1' => 20000,
 			'other_payoff_name2' => '',
-			'other_payoff_total2' => '',
+			'other_payoff_total2' => null,
 			'invoice_email' => '',
 			'invoice_name' => 'テスト2',
 			'invoice_name2' => 'テスト3',
