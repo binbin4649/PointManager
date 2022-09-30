@@ -8,8 +8,10 @@
 		<tr>
 			<th class="col-head" width="150">created<br>modified</th>
 			<td class="col-input">
-				<?php echo $this->request->data['Pmconfig']['created'] ?><br>
-				<?php echo $this->request->data['Pmconfig']['modified'] ?>
+				<?php if(isset($this->request->data['Pmconfig'])): ?>
+					<?php echo $this->request->data['Pmconfig']['created'] ?><br>
+					<?php echo $this->request->data['Pmconfig']['modified'] ?>
+				<?php endif; ?>
 			</td>
 			</td>
 		</tr>
