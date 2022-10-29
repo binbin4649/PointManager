@@ -18,6 +18,19 @@ class UserTotal extends AppModel {
 	    		'UserTotal.yyyymm' => $date,
 	    	]
 	    ]);
+		$orderAdminList = Configure::read('NosPlugin.orderAdminList');
+		if(!empty($orderAdminList)){
+			$tmp_totals = [];
+			foreach($orderAdminList as $mypage_id){
+				foreach($UserTotals as $UserTotal){
+					if($mypage_id == $UserTotal['UserTotal']['mypage_id']){
+						$tmp_totals[] = $UserTotal;
+						continue;
+					}
+				}
+			}
+			$UserTotals = $tmp_totals;
+		}
 	    return $UserTotals;
     }
     

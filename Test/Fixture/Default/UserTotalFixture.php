@@ -9,6 +9,7 @@ class UserTotalFixture extends CakeTestFixture {
 			[
 				'id' => 1,
 				'pmpage_id' => 1,
+				'mypage_id' => 1,
 				'yyyymm' => date('Y-m-t'),
 				'quantity' => 2,
 				'unit_price' => 100,
@@ -21,6 +22,7 @@ class UserTotalFixture extends CakeTestFixture {
 			[
 				'id' => 2,
 				'pmpage_id' => 1,
+				'mypage_id' => 2,
 				'yyyymm' => date('Y-m-t'),
 				'quantity' => 4,
 				'unit_price' => 100,

@@ -214,6 +214,19 @@ class Pmtotal extends AppModel {
 			    'Pmtotal.mf_billing_id' => NULL
 		    ]
 	    ]);
+		$orderAdminList = Configure::read('NosPlugin.orderAdminList');
+		if(!empty($orderAdminList)){
+			$tmp_totals = [];
+			foreach($orderAdminList as $mypage_id){
+				foreach($Pmtotals as $Pmtotal){
+					if($mypage_id == $Pmtotal['Pmtotal']['mypage_id']){
+						$tmp_totals[] = $Pmtotal;
+						continue;
+					}
+				}
+			}
+			$Pmtotals = $tmp_totals;
+		}
 	    foreach($Pmtotals as $Pmtotal){
 		    if($Pmtotal['Pmtotal']['status'] == 'forward'){
 			    $response['data']['id'] = 'forward';

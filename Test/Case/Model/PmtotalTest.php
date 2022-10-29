@@ -24,6 +24,13 @@ class PmtotalTest extends BaserTestCase {
 	    parent::tearDown();
     }
     
+	public function testMfBillingsCreate(){
+		Configure::write('NosPlugin.orderAdminList', ['7', '5']);
+		$r = $this->Pmtotal->mfBillingsCreate();
+		$this->assertEquals('test_id', $r[1]['data']['id']);
+		$this->assertEquals('forward', $r[0]['data']['id']);
+	}
+	
     public function testBillingPdfPath(){
 	    $pmtotal_id = '70';
 	    $result = $this->Pmtotal->billingPdfPath($pmtotal_id);
@@ -70,12 +77,6 @@ class PmtotalTest extends BaserTestCase {
 	    $result = $this->Pmtotal->createInvoice();
 		//$this->assertEquals(6000, $result[0]['Pmtotal']['total']);
 	    $this->assertEquals(21070, $result[0]['Pmtotal']['total']);
-    }
-    
-    public function testMfBillingsCreate(){
-	    $r = $this->Pmtotal->mfBillingsCreate();
-	    $this->assertEquals('test_id', $r[0]['data']['id']);
-	    $this->assertEquals('forward', $r[1]['data']['id']);
     }
     
     public function testUserTotalTotal(){

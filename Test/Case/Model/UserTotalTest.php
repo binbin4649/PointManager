@@ -22,6 +22,14 @@ class UserTotalTest extends BaserTestCase {
 	    parent::tearDown();
     }
     
+    public function testFromPmpageId(){
+        Configure::write('NosPlugin.orderAdminList', ['2', '1']);
+        $pmpage_id = 1;
+        $yyyymm = date('Ym');
+        $r = $this->UserTotal->fromPmpageId($pmpage_id, $yyyymm);
+        $this->assertEquals('2', $r[0]['UserTotal']['mypage_id']);
+    }
+    
     public function testPdfExistsFalse(){
 	    $pmtotal_id = '2';
 	    $result = $this->UserTotal->pdfExists($pmtotal_id);
@@ -52,13 +60,6 @@ class UserTotalTest extends BaserTestCase {
     public function testpmPayOff(){
 	    $result = $this->UserTotal->pmPayOff();
 	    $this->assertEquals(100, $result[0]['UserTotal']['total']);
-    }
-    
-    public function testFromPmpageId(){
-	    $pmpage_id = 1;
-	    $yyyymm = date('Ym');
-	    $r = $this->UserTotal->fromPmpageId($pmpage_id, $yyyymm);
-	    $this->assertEquals('1', $r[0]['UserTotal']['pmpage_id']);
     }
     
     public function testItemPayOff(){
