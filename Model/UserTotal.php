@@ -25,7 +25,6 @@ class UserTotal extends AppModel {
 				foreach($UserTotals as $UserTotal){
 					if($mypage_id == $UserTotal['UserTotal']['mypage_id']){
 						$tmp_totals[] = $UserTotal;
-						continue;
 					}
 				}
 			}
@@ -224,6 +223,7 @@ class UserTotal extends AppModel {
 			    $UserTotal = [];
 			    $UserTotal['UserTotal'] = [
 				    'pmpage_id' => $Pmpage['Pmpage']['id'],
+					'mypage_id' => $Pmpage['Pmpage']['mypage_id'],
 				    'name' => $Pmpage['Pmpage']['other_payoff_name1'].'('.date('m').'月)',
 				    'yyyymm' => $ym,
 				    'quantity' => 1,
@@ -240,6 +240,7 @@ class UserTotal extends AppModel {
 			    $UserTotal = [];
 			    $UserTotal['UserTotal'] = [
 				    'pmpage_id' => $Pmpage['Pmpage']['id'],
+					'mypage_id' => $Pmpage['Pmpage']['mypage_id'],
 				    'name' => $Pmpage['Pmpage']['other_payoff_name2'].'('.date('m').'月)',
 				    'yyyymm' => $ym,
 				    'quantity' => 1,

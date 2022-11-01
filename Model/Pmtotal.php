@@ -215,18 +215,6 @@ class Pmtotal extends AppModel {
 		    ]
 	    ]);
 		$orderAdminList = Configure::read('NosPlugin.orderAdminList');
-		if(!empty($orderAdminList)){
-			$tmp_totals = [];
-			foreach($orderAdminList as $mypage_id){
-				foreach($Pmtotals as $Pmtotal){
-					if($mypage_id == $Pmtotal['Pmtotal']['mypage_id']){
-						$tmp_totals[] = $Pmtotal;
-						continue;
-					}
-				}
-			}
-			$Pmtotals = $tmp_totals;
-		}
 	    foreach($Pmtotals as $Pmtotal){
 		    if($Pmtotal['Pmtotal']['status'] == 'forward'){
 			    $response['data']['id'] = 'forward';
@@ -234,6 +222,17 @@ class Pmtotal extends AppModel {
 			    $due_date = $this->dueDateNextMonth($Pmtotal['Pmtotal']['mypage_id']);
 			    // UserTotal status を全部runに、
 				$UserTotals = $this->userTotalRun($Pmtotal['Pmpage']['id']);
+				if(!empty($orderAdminList)){
+					$tmp_totals = [];
+					foreach($orderAdminList as $mypage_id){
+						foreach($UserTotals as $totals){
+							if($mypage_id == $totals['UserTotal']['mypage_id']){
+								$tmp_totals[] = $totals;
+							}
+						}
+					}
+					$UserTotals = $tmp_totals;
+				}
 				$post_data = [];
 				$post_data['billing'] = [
 					'department_id' => $Pmtotal['Pmpage']['mf_department_id'],

@@ -27,8 +27,8 @@ class PmtotalTest extends BaserTestCase {
 	public function testMfBillingsCreate(){
 		Configure::write('NosPlugin.orderAdminList', ['7', '5']);
 		$r = $this->Pmtotal->mfBillingsCreate();
-		$this->assertEquals('test_id', $r[1]['data']['id']);
-		$this->assertEquals('forward', $r[0]['data']['id']);
+		$this->assertEquals('test_id', $r[0]['data']['id']);
+		$this->assertEquals('forward', $r[1]['data']['id']);
 	}
 	
     public function testBillingPdfPath(){
