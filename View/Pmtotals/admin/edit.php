@@ -35,9 +35,15 @@
 		<tr>
 			<th class="col-head" width="150">明細</th>
 			<td class="col-input">
+				<?php $all_total = 0; ?>
 				<?php foreach($UserTotals as $total): ?>
-					<?php echo $total['UserTotal']['name'].' : '.$total['UserTotal']['quantity'].' : '.$total['UserTotal']['unit_price'].' : '.$total['UserTotal']['total']; ?><br>
+					<?php 
+						echo $total['UserTotal']['name'].' : '.$total['UserTotal']['quantity'].' : '.$total['UserTotal']['unit_price'].' : '.$total['UserTotal']['total'];
+						$all_total = $all_total + $total['UserTotal']['total'];
+					?>
+					<br>
 				<?php endforeach; ?>
+				<?php echo '合計：'.$all_total; ?>
 			</td>
 		</tr>
 		
