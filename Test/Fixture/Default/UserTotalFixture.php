@@ -14,7 +14,7 @@ class UserTotalFixture extends CakeTestFixture {
 				'quantity' => 2,
 				'unit_price' => 100,
 				'total' => 200,
-				'name' => 'テストテスト',
+				'name' => '東京支店様(10月:stanbay1)',
 				'status' => 'before',
 				'created' => '2018-07-30 14:06:01',
 				'modified' => '2018-07-30 14:06:01'
@@ -27,7 +27,7 @@ class UserTotalFixture extends CakeTestFixture {
 				'quantity' => 4,
 				'unit_price' => 100,
 				'total' => 400,
-				'name' => 'テスト',
+				'name' => '東京支店様(10月:wakeup1)',
 				'status' => 'before',
 				'created' => '2018-07-30 14:06:01',
 				'modified' => '2018-07-30 14:06:01'

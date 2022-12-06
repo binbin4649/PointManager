@@ -21,9 +21,14 @@ class UserTotal extends AppModel {
 		$orderAdminList = Configure::read('NosPlugin.orderAdminList');
 		if(!empty($orderAdminList)){
 			$tmp_totals = [];
+			$name_head_pos = '';
+			$name_head = '';
 			foreach($orderAdminList as $mypage_id){
 				foreach($UserTotals as $UserTotal){
 					if($mypage_id == $UserTotal['UserTotal']['mypage_id']){
+						$name_head_pos = strpos($UserTotal['UserTotal']['name'], '(');
+						$name_head = substr($UserTotal['UserTotal']['name'], 0, $name_head_pos);
+						$UserTotal['UserTotal']['name_head'] = $name_head;
 						$tmp_totals[] = $UserTotal;
 					}
 				}

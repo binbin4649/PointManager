@@ -18,13 +18,34 @@
 			</tr>
 		</thead>
 		<tbody>
+		<?php 
+			$name_head = '';
+			$head_total = 0;
+		?>
 		<?php foreach($UserTotals as $UserTotal): ?>
-		<tr>
-			<td class="align-middle"><?php echo $UserTotal['UserTotal']['name']; ?></td>
-			<td class="align-middle"><?php echo $UserTotal['UserTotal']['unit_price']; ?></td>
-			<td class="align-middle"><?php echo $UserTotal['UserTotal']['quantity']; ?></td>
-			<td class="align-middle"><?php echo number_format($UserTotal['UserTotal']['total']); ?></td>
-		</tr>
+			<?php if(isset($UserTotal['UserTotal']['name_head'])): ?>
+				<?php if($UserTotal['UserTotal']['name_head'] != $name_head && $head_total > 1): ?>
+					<tr>
+						<td class="align-middle small text-muted">(<?php echo $name_head.' 小計'; ?>)</td>
+						<td class="align-middle"></td>
+						<td class="align-middle"></td>
+						<td class="align-middle small text-muted">(<?php echo number_format($head_total); ?>)</td>
+					</tr>
+					<?php 
+						$head_total = 0;
+						$name_head = $UserTotal['UserTotal']['name_head'];
+					?>
+				<?php elseif(empty($name_head)): ?>
+					<?php $name_head = $UserTotal['UserTotal']['name_head']; ?>
+				<?php endif; ?>
+				<?php $head_total = $head_total + $UserTotal['UserTotal']['total']; ?>
+			<?php endif; ?>
+			<tr>
+				<td class="align-middle"><?php echo $UserTotal['UserTotal']['name']; ?></td>
+				<td class="align-middle"><?php echo $UserTotal['UserTotal']['unit_price']; ?></td>
+				<td class="align-middle"><?php echo $UserTotal['UserTotal']['quantity']; ?></td>
+				<td class="align-middle"><?php echo number_format($UserTotal['UserTotal']['total']); ?></td>
+			</tr>
 		<?php endforeach; ?>
 		<tr>
 			<td colspan="2">
