@@ -247,7 +247,7 @@ class Pmtotal extends AppModel {
 						'name' => $UserTotal['UserTotal']['name'],
 						'quantity' => $UserTotal['UserTotal']['quantity'],
 						'unit_price' => $UserTotal['UserTotal']['unit_price'],
-						'excise' => false
+						'excise' => "ten_percent"
 					];
 				}
 				$response = $this->mfAccess($url, $post_data, true);
