@@ -26,7 +26,7 @@ class PmpagesController extends PointManagerAppController {
       if($data['Pmpage']['mypage_id']) $conditions[] = array('Pmpage.mypage_id' => $data['Pmpage']['mypage_id']);
       if($data['Mypage']['name']) $conditions[] = array('Mypage.name like' => '%'.$data['Mypage']['name'].'%');
     }
-    $conditions[] = array('Mypage.status' => 0);
+    //$conditions[] = array('Mypage.status' => 0);
     $this->paginate = array('conditions' => $conditions,
       'order' => 'Pmpage.id DESC',
       'limit' => 50
