@@ -15,7 +15,7 @@ class PmpageFixture extends CakeTestFixture {
 			'other_payoff_name1' => '月額保守費',
 			'other_payoff_total1' => 20000,
 			'other_payoff_name2' => '',
-			'other_payoff_total2' => '',
+			'other_payoff_total2' => '0',
 			'invoice_email' => '',
 			'invoice_name' => 'テスト2',
 			'invoice_name2' => 'テスト3',
@@ -42,6 +42,7 @@ class PmpageFixture extends CakeTestFixture {
 			'position_name' => '部長',
 			//'invoice_email' => 'binbin4649@gmail.com',
 			'invoice_mail_notice' => 'yes',
+			'mf_department_id' => 'rxTbVvBFaAnjqwri4o7jjg',
 			'created' => '2018-07-30 14:06:01',
 			'modified' => '2018-07-30 14:06:01'
 		),

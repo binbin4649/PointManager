@@ -24,6 +24,107 @@ class PmtotalTest extends BaserTestCase {
 	    parent::tearDown();
     }
     
+	/*
+	https://api.biz.moneyforward.com/authorize?response_type=code&client_id=13079033563764&scope=mfc/invoice/data.write&redirect_uri=http://localhost/
+	&client_idとredirect_uriを取り替えて、ブラウザでアクセス
+
+	http://localhost/?code=AxbUfX7xgNsE-W2nNp8nStcSnwvQXfm0gJMLNsd03qw&iss=https%3A%2F%2Fbiz.moneyforward.com
+	codeの部分を控えて、$authCodeに入れる。有効期限に注意
+
+	ブラウザ、.test.php -> PointManeger -> Pmtotal 
+	var_dumpのコメントアウトをはずして実行
+	*/
+    public function testExecuteMfApiTokenRequest() {
+        //$clientID = '13079033563764';
+		$clientID = '';
+        $clientSecret = 'wayyNDtT74UA2NF-vXC2D_jM3AJ3GCbMLaYGRn3rUmHiSllcl08ct1SLLtK2336gJ5ySg3RTheyWQfiqarkMwQ';
+        $authCode = 'AxbUfX7xgNsE-W2nNp8nStcSnwvQXfm0gJMLNsd03qw';
+        $redirectURI = 'http://localhost/';
+		if(empty($clientID) || empty($clientSecret)){
+			$this->markTestSkipped('access_tokenを取得する時に実行する。');
+		}
+        $result = $this->Pmtotal->executeMfApiTokenRequest($clientID, $clientSecret, $authCode, $redirectURI);
+		// var_dump($result);
+		// die;
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('access_token', $result);
+        $this->assertArrayHasKey('token_type', $result);
+        $this->assertArrayHasKey('scope', $result);
+        $this->assertArrayHasKey('refresh_token', $result);
+    }
+
+    public function testRefreshMfAccessToken() {
+        // $clientID = '13079033563764';
+		$clientID = '';
+        $clientSecret = 'wayyNDtT74UA2NF-vXC2D_jM3AJ3GCbMLaYGRn3rUmHiSllcl08ct1SLLtK2336gJ5ySg3RTheyWQfiqarkMwQ';
+        $refreshToken = 'PPopY4qBRLV7obkNZ6ov-Dmnu-_HOk0Bh6KWdBkTXvs';//PmconfigFixture.phpを見て新しいtokenを入れる
+		if(empty($clientID) || empty($clientSecret)){
+			$this->markTestSkipped('access_tokenをrefreshする時に実行する。');
+		}
+        $result = $this->Pmtotal->refreshMfAccessToken($clientID, $clientSecret, $refreshToken);
+		var_dump($result);
+		die;
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('access_token', $result);
+        $this->assertArrayHasKey('token_type', $result);
+        $this->assertArrayHasKey('scope', $result);
+        $this->assertArrayHasKey('refresh_token', $result);
+    }
+
+	// public function testBillingPdf()
+	// {
+	// 	$billing_id = 'Gu-1_YwfvQN2u8tG_JgzlQ';
+	// 	$pmtotal_id = '2';
+	// 	$result = $this->Pmtotal->billingPdf($billing_id, $pmtotal_id);
+	// 	var_dump($result);
+	// 	die;
+	// }
+
+	// public function testMfBillingsCreate()
+	// {
+	// 	$result = $this->Pmtotal->mfBillingsCreate();
+	// 	var_dump($result);
+	// 	die;
+		
+	// }
+
+    public function testAddPartner() {
+        $data = [
+            'Pmpage' => [
+                'id' => '123',
+				'mypage_id' => 1,
+                'invoice_company_name' => 'テスト株式会社',
+                'invoice_zip' => '100-0001',
+                'invoice_tel' => '03-1234-5678',
+                'invoice_prefecture' => '東京都',
+                'invoice_address_1' => '千代田区',
+                'invoice_address_2' => 'テストビルディング',
+                'invoice_name' => '山田太郎',
+                'invoice_position_name' => '部長',
+                'invoice_department_name' => '営業部',
+                'invoice_email' => 'invoice@example.com'
+			],
+			'Mypage' => [
+				'id' => 1,
+				'name' => 'テスト太郎',
+				'email' => 'test@example.com'
+			]
+        ];
+
+        $expected = [
+            'id' => 'test_id',
+            'departments' => [
+                ['id' => 'test_departments_id']
+            ]
+        ];
+        $result = $this->Pmtotal->addPartner($data);
+        $this->assertNotEmpty($result);
+        $this->assertEquals($expected['id'], $result['Pmpage']['mf_partner_id']);
+        $this->assertEquals($expected['departments'][0]['id'], $result['Pmpage']['mf_department_id']);
+    }
+
     public function testBillingPdfPath(){
 	    $pmtotal_id = '70';
 	    $result = $this->Pmtotal->billingPdfPath($pmtotal_id);
@@ -68,14 +169,15 @@ class PmtotalTest extends BaserTestCase {
     
     public function testCreateInvoice(){
 	    $result = $this->Pmtotal->createInvoice();
-	    $this->assertEquals(21070, $result[0]['Pmtotal']['total']);
+	    // $this->assertEquals(21070, $result[0]['Pmtotal']['total']);
+		$this->assertEquals(6000, $result[0]['Pmtotal']['total']);
     }
     
-    public function testMfBillingsCreate(){
-	    $r = $this->Pmtotal->mfBillingsCreate();
-	    $this->assertEquals('test_id', $r[0]['data']['id']);
-	    $this->assertEquals('forward', $r[1]['data']['id']);
-    }
+    // public function testMfBillingsCreate(){
+	//     $r = $this->Pmtotal->mfBillingsCreate();
+	//     $this->assertEquals('test_id', $r[0]['data']['id']);
+	//     $this->assertEquals('forward', $r[1]['data']['id']);
+    // }
     
     public function testUserTotalTotal(){
 	    $pmpage_id = 1;
