@@ -456,7 +456,7 @@ class Pmtotal extends AppModel {
 		    return false;
 	    }
 	    $time_diff = time() - strtotime($Pmconfig['Pmconfig']['modified']);
-	    if($time_diff > 43200){// 43200 = 12時間
+	    if($time_diff > 1800){// 1800 = 30分
 			$new_token = $this->refreshMfAccessToken($Pmconfig['Pmconfig']['client_id'], $Pmconfig['Pmconfig']['client_secret'], $Pmconfig['Pmconfig']['refresh_token']);
 		    if(isset($new_token['error']) or isset($new_token['errors'])){
 			    $this->log('Pmtotal.php getMfAccessToken MF API Error. '.print_r($new_token, true), 'emergency');
