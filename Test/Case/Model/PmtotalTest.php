@@ -24,6 +24,14 @@ class PmtotalTest extends BaserTestCase {
 	    parent::tearDown();
     }
     
+	// public function testGetMfAccessToken(){
+
+	// 	$r = $this->Pmtotal->getMfAccessToken();
+	// 	var_dump($r);
+	// 	die;
+
+	// }
+
 	/*
 	https://api.biz.moneyforward.com/authorize?response_type=code&client_id=13079033563764&scope=mfc/invoice/data.write&redirect_uri=http://localhost/
 	&client_idとredirect_uriを取り替えて、ブラウザでアクセス

@@ -198,7 +198,51 @@ class Pmtotal extends AppModel {
 	    return $due_date;
     }
     
-
+	//cd path/to/your/app
+	/// Console/cake Test mf
+	public function testMfBillingsCreate(){
+		$mf_department_id = 'UcCNoeYkgg8FyRKYIDjaFg';
+		$billing_date = date('Y-m-d', strtotime('first day of next month'));
+		$due_date = date('Y-m-d', strtotime('last day of next month'));
+		$bill_data = [
+			'department_id' => $mf_department_id,
+			'title' => 'テストタイトル',
+			'billing_date' => $billing_date,
+			'due_date' => $due_date,
+			'billing_number' => '99999',
+			'document_name' => 'テスト請求書',
+		];
+		$bill_response = $this->sendBillingDataToMoneyForward($bill_data);
+		if(empty($bill_response['id'])){
+			$this->log('Pmtotal.php testMfBillingsCreate bill_response error. '.print_r($bill_data, true), 'emergency');
+		}
+		$billing_id = $bill_response['id'];
+		$UserTotals = [
+			[
+				'name' => 'テストイチ',
+				'price' => '100',
+				'quantity' => '70',
+			],
+			[
+				'name' => '事務手数料',
+				'price' => '300',
+				'quantity' => '1',
+			],
+		];
+		foreach($UserTotals as $UserTotal){
+			$item = [
+				'name' => $UserTotal['name'],
+				'price' => $UserTotal['price'],
+				'quantity' => $UserTotal['quantity']
+			];
+			$item_result = $this->addItemToBilling($billing_id, $item);
+			if($item_result === false){
+				$this->log('Pmtotal.php testMfBillingsCreate item error. '.print_r($item, true), 'emergency');
+			}
+		}
+		$pmtotal_id = '99999';
+		return $this->billingPdf($billing_id, $pmtotal_id);
+	}
 
     public function mfBillingsCreate(){
 	    $document_name = Configure::read('NosPlugin.InvoiceDocumentName');

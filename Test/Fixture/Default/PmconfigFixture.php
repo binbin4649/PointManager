@@ -10,10 +10,10 @@ class PmconfigFixture extends CakeTestFixture {
 				'id' => 1,
 				'client_id' => '13079033563764',
 				'client_secret' => 'wayyNDtT74UA2NF-vXC2D_jM3AJ3GCbMLaYGRn3rUmHiSllcl08ct1SLLtK2336gJ5ySg3RTheyWQfiqarkMwQ',
-				'refresh_token' => 'sX66IfE4r_y2-BAzduwgY1G4cu5x-XsVbnDQOkV4mZk',
-				'access_token' => 'wqvteZsdOh07Q-HiqxFlWi8LcNZtk7OjlWHSrE37VGk',
-				'created' => date('Y-m-d H:i:s'),
-				'modified' => date('Y-m-d H:i:s')
+				'refresh_token' => '7gYxkhBs3isEqMYxpqMfDwcLruoqcEEDKwFkAexrJJ0',
+				'access_token' => 'GGzrO63Mq2fz3jT2yZDYAwfoCV_-o6afVVcPrddZXGI',
+				'created' => '2024-05-30 18:19:48',
+				'modified' => '2024-05-30 18:19:48'
 			]
 		];
 		parent::init();
