@@ -44,7 +44,7 @@ class Pmtotal extends AppModel {
     
     //全部のまとめ役、cronで叩く用
     public function createInvoice(){
-		set_time_limit(1800);//30分
+		set_time_limit(3600);//60分
 	    $UserTotalModel = ClassRegistry::init('PointManager.UserTotal');
 	    $user_payoff = $UserTotalModel->userPayOff();//ユーザー単位の精算
 	    $pmpage_payoff = $UserTotalModel->pmPayOff();// pmpage自身のポイント精算
@@ -139,12 +139,12 @@ class Pmtotal extends AppModel {
     }
     
 	//cd path/to/your/app
-	/// Console/cake Test payOffMail
+	/// Console/cake Test payMail
     public function payOffMail(){
 	    $MypageModel = ClassRegistry::init('Members.Mypage');
 	    $return = [];
 	    // $ym = date('Y-m-t');//今月末
-		$ym = date('Y-m-t', strtotime('first day of this month -1 day'));//先月末
+		$ym = date('Y-m-t', strtotime('last day of previous month'));//先月末
 	    $Pmtotals = $this->find('all', [
 		    'conditions' => [
 			    'Pmtotal.yyyymm' => $ym,
