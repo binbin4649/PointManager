@@ -222,7 +222,7 @@ class Pmtotal extends AppModel
 		$mf_department_id = 'UcCNoeYkgg8FyRKYIDjaFg';
 		$billing_date = date('Y-m-d', strtotime('first day of next month'));
 		$due_date = date('Y-m-d', strtotime('last day of next month'));
-		$bill_data = [
+		$data = [
 			'department_id' => $mf_department_id,
 			'title' => 'テストタイトル',
 			'billing_date' => $billing_date,
@@ -230,11 +230,6 @@ class Pmtotal extends AppModel
 			'billing_number' => '99999',
 			'document_name' => 'テスト請求書',
 		];
-		$bill_response = $this->sendBillingDataToMoneyForward($bill_data);
-		if (empty($bill_response['id'])) {
-			$this->log('Pmtotal.php testMfBillingsCreate bill_response error. ' . print_r($bill_data, true), 'emergency');
-		}
-		$billing_id = $bill_response['id'];
 		$UserTotals = [
 			[
 				'name' => 'テストイチ',
@@ -247,17 +242,12 @@ class Pmtotal extends AppModel
 				'quantity' => '1',
 			],
 		];
-		foreach ($UserTotals as $UserTotal) {
-			$item = [
-				'name' => $UserTotal['name'],
-				'price' => $UserTotal['price'],
-				'quantity' => $UserTotal['quantity']
-			];
-			$item_result = $this->addItemToBilling($billing_id, $item);
-			if ($item_result === false) {
-				$this->log('Pmtotal.php testMfBillingsCreate item error. ' . print_r($item, true), 'emergency');
-			}
+
+		$bill_response = $this->CreateNewInvoiceTemplateBilling($data, $UserTotals);
+		if (empty($bill_response['id'])) {
+			$this->log('Pmtotal.php testMfBillingsCreate bill_response error. ' . print_r($data, true), 'emergency');
 		}
+		$billing_id = $bill_response['id'];
 		$pmtotal_id = '99999';
 		return $this->billingPdf($billing_id, $pmtotal_id);
 	}
@@ -295,23 +285,12 @@ class Pmtotal extends AppModel
 					'billing_number' => $Pmtotal['Pmtotal']['id'],
 					'document_name' => $document_name,
 				];
-				$bill_response = $this->sendBillingDataToMoneyForward($bill_data);
+
+				$bill_response = $this->CreateNewInvoiceTemplateBilling($bill_data, $UserTotals);
 				if (empty($bill_response['id'])) {
-					$this->log('Pmtotal.php mfBillingsCreate bill_response error. ' . print_r($bill_data, true), 'emergency');
-					continue;
+					$this->log('Pmtotal.php mfBillingsCreate error. ' . print_r(array_merge($bill_data, $UserTotals), true), 'emergency');
 				}
 				$billing_id = $bill_response['id'];
-				foreach ($UserTotals as $UserTotal) {
-					$item = [
-						'name' => $UserTotal['UserTotal']['name'],
-						'price' => $UserTotal['UserTotal']['unit_price'],
-						'quantity' => $UserTotal['UserTotal']['quantity']
-					];
-					$item_result = $this->addItemToBilling($billing_id, $item);
-					if ($item_result === false) {
-						$this->log('Pmtotal.php mfBillingsCreate item error. ' . print_r($item, true), 'emergency');
-					}
-				}
 			}
 			$Pmtotal['Pmtotal']['mf_billing_id'] = $billing_id;
 			$this->create();
@@ -682,6 +661,53 @@ class Pmtotal extends AppModel
 		return $decodedResponse;
 	}
 
+	public function CreateNewInvoiceTemplateBilling($data, $UserTotals)
+	{
+		$url = 'https://invoice.moneyforward.com/api/v3/invoice_template_billings';
+		$headers = [
+			'Accept: application/json',
+			'Authorization: Bearer ' . $this->getMfAccessToken()['access_token'],
+			'Content-Type: application/json'
+		];
+		$postData = [
+			'department_id' => $data['department_id'],
+			'title' => $data['title'],
+			'billing_date' => $data['billing_date'],
+			'due_date' => $data['due_date'],
+			'billing_number' => $data['billing_number'],
+			'document_name' => $data['document_name'],
+		];
+		foreach ($UserTotals as $UserTotal) {
+			$postData['items'][] = [
+				'name' => $UserTotal['name'],
+				'price' => $UserTotal['price'],
+				'quantity' => $UserTotal['quantity'],
+				'excise' => 'ten_percent'
+			];
+		}
+		$jsonData = json_encode($postData);
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$response = curl_exec($ch);
+		if (curl_errno($ch)) {
+			$this->log('Pmtotal.php CreateNewInvoiceTemplateBilling curl error: ' . curl_error($ch), 'emergency');
+			curl_close($ch);
+			return false;
+		}
+		curl_close($ch);
+		$decodedResponse = json_decode($response, true);
+		if (isset($decodedResponse['error'])) {
+			$this->log('Pmtotal.php CreateNewInvoiceTemplateBilling API error: ' . print_r($decodedResponse, true), 'emergency');
+			return false;
+		}
+		return $decodedResponse;
+	}
+
+	//CreateNewInvoiceTemplateBilling以降使ってない
 	public function sendBillingDataToMoneyForward($data)
 	{
 		$url = 'https://invoice.moneyforward.com/api/v3/billings';
@@ -719,6 +745,7 @@ class Pmtotal extends AppModel
 		return $decodedResponse;
 	}
 
+	//CreateNewInvoiceTemplateBilling以降使ってない
 	public function addItemToBilling($billing_id, $item)
 	{
 		$url = 'https://invoice.moneyforward.com/api/v3/billings/' . $billing_id . '/items';
