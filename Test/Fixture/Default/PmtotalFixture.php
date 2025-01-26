@@ -1,10 +1,12 @@
 <?php
 
-class PmtotalFixture extends CakeTestFixture {
-	
+class PmtotalFixture extends CakeTestFixture
+{
+
 	public $import = array('model' => 'PointManager.Pmtotal');
-	
-	public function init(){
+
+	public function init()
+	{
 		$this->records = [
 			[
 				'id' => 1,
@@ -13,7 +15,7 @@ class PmtotalFixture extends CakeTestFixture {
 				'yyyymm' => date('Y-m-d', strtotime('last day of previous month')),
 				'total' => 1000,
 				'status' => 'forward',
-				'mail_submit' => '',
+				'mail_submit' => null,
 				'invoice_submit' => '',
 				'payment_date' => null,
 				'mf_billing_id' => '',
@@ -48,6 +50,4 @@ class PmtotalFixture extends CakeTestFixture {
 		];
 		parent::init();
 	}
-	
-
 }

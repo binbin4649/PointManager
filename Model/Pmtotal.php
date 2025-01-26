@@ -59,7 +59,9 @@ class Pmtotal extends AppModel
 		//$result = $UserTotalModel->forwardToUserTotal();//繰越があったらuserTotal追加する
 		$pm_payoff = $this->PmPayOff(); // pmpage単位の精算
 		$billing = $this->mfBillingsCreate(); //MFに請求書データ送る
-		sleep(300); //5分後
+		if (!Configure::read('MccPlugin.TEST_MODE')) {
+			sleep(300); //5分後
+		}
 		$mail = $this->payOffMail(); //請求書送付のご案内
 		return $mail;
 	}
@@ -663,6 +665,10 @@ class Pmtotal extends AppModel
 
 	public function CreateNewInvoiceTemplateBilling($data, $UserTotals)
 	{
+		if (Configure::read('MccPlugin.TEST_MODE')) {
+			$aray['id'] = 'test_id';
+			return $aray;
+		}
 		$url = 'https://invoice.moneyforward.com/api/v3/invoice_template_billings';
 		$headers = [
 			'Accept: application/json',
