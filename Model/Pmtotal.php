@@ -200,19 +200,27 @@ class Pmtotal extends AppModel
 	}
 
 	// 会社によって支払日が違う
-	public function dueDateNextMonth($mypage_id)
+	public function dueDateNextMonth($mypage_id, $restore = false)
 	{
 		$Invoice2Month = Configure::read('NosPlugin.Invoice2Month');
 		$due_date = '';
 		if (!empty($Invoice2Month)) {
 			foreach ($Invoice2Month as $id) {
 				if ($mypage_id == $id) {
-					$due_date = date('Y-m-d', strtotime('last day of 2 month')); //翌々月末
+					if ($restore) {
+						$due_date = date('Y-m-d', strtotime('last day of next month')); //翌月末
+					} else {
+						$due_date = date('Y-m-d', strtotime('last day of 2 month')); //翌々月末
+					}
 				}
 			}
 		}
 		if (empty($due_date)) {
-			$due_date = date('Y-m-d', strtotime('last day of next month')); //翌月末
+			if ($restore) {
+				$due_date = date('Y-m-d', strtotime('last day of this month')); //今月末
+			} else {
+				$due_date = date('Y-m-d', strtotime('last day of next month')); //翌月末
+			}
 		}
 		return $due_date;
 	}
@@ -254,7 +262,7 @@ class Pmtotal extends AppModel
 		return $this->billingPdf($billing_id, $pmtotal_id);
 	}
 
-	public function mfBillingsCreate()
+	public function mfBillingsCreate($restore = false)
 	{
 		$document_name = Configure::read('NosPlugin.InvoiceDocumentName');
 		$title = Configure::read('NosPlugin.InvoiceTitle');
@@ -262,23 +270,46 @@ class Pmtotal extends AppModel
 			$document_name = '請求書';
 		}
 		$res = [];
-		$ym = date('Y-m-t'); //今月末
-		$billing_date = date('Y-m-d', strtotime('first day of next month')); //翌月1日
-		$Pmtotals = $this->find('all', [
-			'conditions' => [
-				'Pmtotal.yyyymm' => $ym,
-				'Pmtotal.mf_billing_id' => NULL
-			]
-		]);
+		if ($restore) {
+			$ym = date('Y-m-d', strtotime('last day of previous month')); //先月末
+			$billing_date = date('Y-m-d', strtotime('first day of this month')); //今月1日
+		} else {
+			$ym = date('Y-m-t'); //今月末
+			$billing_date = date('Y-m-d', strtotime('first day of next month')); //翌月1日
+		}
+
+		if ($restore) {
+			$Pmtotals = $this->find('all', [
+				'conditions' => [
+					'Pmtotal.yyyymm' => $ym,
+					'Pmtotal.mf_billing_id <>' => 'forward'
+				]
+			]);
+		} else {
+			$Pmtotals = $this->find('all', [
+				'conditions' => [
+					'Pmtotal.yyyymm' => $ym,
+					'Pmtotal.mf_billing_id' => NULL
+				]
+			]);
+		}
 		foreach ($Pmtotals as $Pmtotal) {
 			$bill_response = [];
 			if ($Pmtotal['Pmtotal']['status'] == 'forward') {
 				$billing_id = $bill_response['id'] = 'forward';
 				$bill_response['department_id'] = $Pmtotal['Pmpage']['mf_department_id'];
 			} else {
-				$due_date = $this->dueDateNextMonth($Pmtotal['Pmtotal']['mypage_id']);
+				$due_date = $this->dueDateNextMonth($Pmtotal['Pmtotal']['mypage_id'], $restore);
 				// UserTotal status を全部runに、
-				$UserTotals = $this->userTotalRun($Pmtotal['Pmpage']['id']);
+				$UserTotals = [];
+				$user_totals = $this->userTotalRun($Pmtotal['Pmpage']['id']);
+				foreach ($user_totals as $user_total) {
+					$UserTotals[] = [
+						'name' => $user_total['UserTotal']['name'],
+						'price' => $user_total['UserTotal']['unit_price'],
+						'quantity' => $user_total['UserTotal']['quantity'],
+					];
+				}
 				$bill_data = [
 					'department_id' => $Pmtotal['Pmpage']['mf_department_id'],
 					'title' => $title,
@@ -287,7 +318,6 @@ class Pmtotal extends AppModel
 					'billing_number' => $Pmtotal['Pmtotal']['id'],
 					'document_name' => $document_name,
 				];
-
 				$bill_response = $this->CreateNewInvoiceTemplateBilling($bill_data, $UserTotals);
 				if (empty($bill_response['id'])) {
 					$this->log('Pmtotal.php mfBillingsCreate error. ' . print_r(array_merge($bill_data, $UserTotals), true), 'emergency');
